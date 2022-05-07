@@ -31,13 +31,9 @@ app.post('/upload', (request, response) => {
             if (err)
                 return response.status(500).send(err)
         })
-
-        console.log("purchaseFile: %j", purchaseFile)
-
-        const parser = csvParse.parse({ delimiter: ',' })
+        const parser = csvParse.parse({ delimiter: ',', columns: true, trim:true })
         const records = []
         parser.on('readable', () => {
-            console.log('reading')
             let record;
             while((record = parser.read()) !== null) {
                 records.push(record)
