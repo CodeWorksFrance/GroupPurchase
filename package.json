@@ -24,6 +24,7 @@
   ],
   "license": "GPL-3.0",
   "devDependencies": {
+    "csv-parse": "^5.0.4",
     "csv-parser": "^3.0.0",
     "jest": "^28.1.0"
   },

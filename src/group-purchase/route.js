@@ -1,8 +1,8 @@
 const express = require('express')
 const fileUpload = require('express-fileupload')
 const bodyParser = require('body-parser')
-const csvParser = require('csv-parser')
-const morgan = require('morgan')
+const csvParse = require('csv-parse')
+
 const app = express()
 const port = 3000
 
@@ -25,21 +25,31 @@ app.post('/upload', (request, response) => {
     if (!request.files || Object.keys(request.files).length === 0) {
         return response.status(400).send('No file uploaded')
     } else {
-        purchaseFile = request.files.purchaseFile
-        uploadPath = './uploads/' + purchaseFile.name
+        const purchaseFile = request.files.purchaseFile
+        const uploadPath = './uploads/' + purchaseFile.name
         purchaseFile.mv(uploadPath, function (err) {
             if (err)
                 return response.status(500).send(err)
-            const parser = csvParser({ delimiter: ';' })
-            const records = []
-            parser.on('readable', () => {
-                let record;
-                while((record = parser.read()) !== null) {
-                    records.push(record)
-                }
-            })
-            response.send(records.toString())
         })
+
+        console.log("purchaseFile: %j", purchaseFile)
+
+        const parser = csvParse.parse({ delimiter: ',' })
+        const records = []
+        parser.on('readable', () => {
+            console.log('reading')
+            let record;
+            while((record = parser.read()) !== null) {
+                records.push(record)
+            }
+        })
+        parser.on('error', (err) => {
+            console.error(err.message)
+        })
+        parser.write(purchaseFile.data);
+        parser.end()
+        console.log(records)
+        response.send('File uploaded')
     }
 })
 
