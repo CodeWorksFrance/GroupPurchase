@@ -1,0 +1,37 @@
+{
+  "name": "the-group-purchase-kata",
+  "version": "1.0.0",
+  "description": "Workshops on SRP and maybe DIP from SOLID principles",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "start": "node src/group-purchase/route.js"
+  },
+  "keywords": [
+    "kata;",
+    "SOLID"
+  ],
+  "contributors": [
+    {
+      "name": "Christophe Thibaut",
+      "email": "christophe.thibaut@codeworks.fr",
+      "url": "chistophethibaut.com"
+    },
+    {
+      "name": "Michelle AVOMO",
+      "email": "michelle.avomo@codeworks.fr"
+    }
+  ],
+  "license": "GPL-3.0",
+  "devDependencies": {
+    "csv-parser": "^3.0.0",
+    "jest": "^28.1.0"
+  },
+  "dependencies": {
+    "body-parser": "^1.20.0",
+    "express": "^4.18.1",
+    "express-fileupload": "^1.3.1",
+    "morgan": "^1.10.0",
+    "pug": "^3.0.2"
+  }
+}
