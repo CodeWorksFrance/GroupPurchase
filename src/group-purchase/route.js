@@ -36,7 +36,12 @@ app.post('/upload', (request, response) => {
         parser.on('readable', () => {
             let record;
             while((record = parser.read()) !== null) {
-                records.push(record)
+                const purchaseItem = {
+                    label: record.item,
+                    unitPrice: Number.parseFloat(record.unitp),
+                    quantity: Number.parseInt(record.qty),
+                    buyer: record.buyer }
+                records.push(purchaseItem)
             }
         })
         parser.on('error', (err) => {
