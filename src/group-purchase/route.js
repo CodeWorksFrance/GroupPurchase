@@ -97,6 +97,19 @@ const getUsers = (request, response) => {
         }
     })
 }
+
+const createPurchase = (request, response) => {
+    const { user, date, shipping_fee } = request.body
+    pool.query('INSERT INTO PURCHASES (User_Id, Creation_Date, Shipping_Fee) SELECT u.Id, $2, $3 FROM Users as u WHERE u.name = $1;', [user, date, shipping_fee], (error, result) => {
+        if (error) {
+            response.status(400).send(error)
+        } else {
+            response.status(201).send("Purchase created");
+        }
+    })
+}
 app.post('/users', createUser)
 app.get('/users', getUsers)
+app.post('/purchases', createPurchase)
+
 
