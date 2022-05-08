@@ -51,14 +51,17 @@ app.get('/purchase/:id', (request, response) => {
                         }
                         purchase.items.push(item)
                     })
-                    response.render("purchase", { purchase: purchase, getTotal: (items) => {
+                    response.render("purchase", {
+                        purchase: purchase,
+                        getTotal: (items) => {
                             let result = 0;
                             items.forEach(item => {
                                 result += item.amount
                             })
                             return result
-                        }
-                    })
+                        },
+                        bills: computeBills(purchase.items, purchase.shippingFee),
+                        showRunningTotal: true })
                 }
             })
         }
@@ -166,47 +169,40 @@ const createPurchase = (purchase, response) => {
                             }
                         })
                 }
-                response.status(201).send(`Purchase ${purchaseId} created`);
+                response.redirect(`/purchase/${purchaseId}`);
             }
         })
 }
 
-const getPurchase = (request, response) => {
-    const id = parseInt(request.params.id)
-    pool.query('SELECT p.id, u.name, creation_date, shipping_fee FROM Purchases p INNER JOIN Users u ON u.id = p.user_id WHERE p.id = $1', [id], (error, result) => {
-        if(error) {
-            response.status(400).send(error)
-        } else {
-            const row = result.rows[0]
-            const purchase = {
-                id: row.id,
-                user: row.name,
-                creationDate: row.creation_date,
-                shippingFee: row.shipping_fee,
-                items: [],
-            }
-            pool.query('SELECT i.label, i.quantity, i.unit_price, u.name FROM Purchase_Items i INNER JOIN Users u ON u.id = i.buyer_id WHERE i.purchase_id = $1', [id], (error, result) => {
-                if (error) {
-                    response.status(400).send(error)
-                } else {
-                    result.rows.forEach( row => {
-                        const item = {
-                            label: row.label,
-                            quantity: row.quantity,
-                            unitPrice: row.unit_price,
-                            amount: row.quantity * row.unit_price,
-                            buyer: row.name,
-                        }
-                        purchase.items.push(item)
-                    })
-                    response.status(200).json(purchase)
-                }
-            })
-        }
-    })
-}
 app.post('/users', createUser)
 app.get('/users', getUsers)
-app.get('/purchases/:id', getPurchase)
 
-
+const computeBills = (items, shippingFee) => {
+    const bills = []
+    var grand_total = 0
+    items.forEach(item => {
+        if(!bills[item.buyer]) {
+            bills[item.buyer] = { amount: 0 }
+        }
+        bills[item.buyer].amount += item.amount
+        grand_total += item.amount
+    })
+    const result = []
+    let total_fee = 0;
+    let rounded_total_fee = 0
+    let rounded_total = 0
+    let running_total = 0
+    const rounded = (n) => {
+        return (Math.round(n*100) / 100)
+    }
+    for(const key of Object.keys(bills)) {
+        const fee = shippingFee * bills[key].amount / grand_total
+        total_fee += fee
+        const rounded_fee = rounded(total_fee) - rounded_total_fee
+        rounded_total_fee += rounded_fee
+        const total = bills[key].amount + rounded_fee
+        running_total += total
+        result.push({ buyer:key, amount: bills[key].amount, shipping: rounded_fee, total: total, running: running_total })
+    }
+    return result
+}

@@ -8,19 +8,55 @@ html
            .modal-dialog
                .modal-content
                  .modal-body
-                   h1 Purchase
-                   div.form-group
+                   div.purchase
+                    h3 Purchase
                     table.ui.celled.table.center.aligned
                         tbody
                             tr
-                                td User:
+                                th Name
+                                th Date
+                                th Amount
+                                th Shipping
+                                th Total
+                            tr
                                 td #{ purchase.user }
-                            tr
-                                td Date:
                                 td #{ (purchase.creationDate).toLocaleDateString("fr") }
+                                td(style="text-align:right") #{ getTotal(purchase.items).toFixed(2) }
+                                td(style="text-align:right") #{ purchase.shippingFee }
+                                td(style="text-align:right") #{ (getTotal(purchase.items) + Number.parseFloat(purchase.shippingFee)).toFixed(2) }
+                   div.items
+                    h3 items
+                    table.ui.celled.table.aligned
+                        tbody
                             tr
-                                td Shipping:
-                                td #{ purchase.shippingFee }
+                                th Item
+                                th Unit Price
+                                th Quantity
+                                th Total
+                                th Buyer
+                            each item in purchase.items
+                                tr
+                                    td #{ item.label }
+                                    td(style="text-align:right") #{ item.unitPrice }
+                                    td(style="text-align:right") #{ item.quantity }
+                                    td(style="text-align:right") #{ item.amount.toFixed(2) }
+                                    td #{ item.buyer }
+                   div.bills
+                    h3 Bills
+                    table.ui.celled.table.aligned
+                        tbody
                             tr
-                                td Total:
-                                td #{ getTotal(purchase.items) }
+                                th Buyer
+                                th Amount
+                                th Shipping
+                                th Total
+                                if showRunningTotal
+                                    th Running
+                            each bill in bills
+                                tr
+                                    td #{ bill.buyer }
+                                    td(style="text-align:right") #{ bill.amount.toFixed(2) }
+                                    td(style="text-align:right") #{ bill.shipping.toFixed(2)  }
+                                    td(style="text-align:right") #{ bill.total.toFixed(2)  }
+                                    if showRunningTotal
+                                        td(style="text-align:right") #{ bill.running.toFixed(2)  }
