@@ -35,36 +35,38 @@ app.post('/upload', (request, response) => {
         const purchaseFile = request.files.purchaseFile
         const uploadPath = './uploads/' + purchaseFile.name
         purchaseFile.mv(uploadPath, function (err) {
-            if (err)
+            if (err) {
                 return response.status(500).send(err)
-        })
-        const parser = csvParse.parse({delimiter: ',', columns: true, trim: true})
-        const items = []
-        parser.on('readable', () => {
-            let record;
-            while ((record = parser.read()) !== null) {
-                const purchaseItem = {
-                    label: record.item,
-                    unitPrice: Number.parseFloat(record.unitp),
-                    quantity: Number.parseInt(record.qty),
-                    buyer: record.buyer
+            } else {
+                const parser = csvParse.parse({delimiter: ',', columns: true, trim: true})
+                const items = []
+                parser.on('readable', () => {
+                    let record;
+                    while ((record = parser.read()) !== null) {
+                        const purchaseItem = {
+                            label: record.item,
+                            unitPrice: Number.parseFloat(record.unitp),
+                            quantity: Number.parseInt(record.qty),
+                            buyer: record.buyer
+                        }
+                        items.push(purchaseItem)
+                    }
+                })
+                parser.on('error', (err) => {
+                    console.error(err.message)
+                })
+                parser.write(purchaseFile.data);
+                parser.end()
+                const purchase = {
+                    user: request.body.user,
+                    purchaseDate: request.body.date,
+                    shippingFee: Number.parseFloat(request.body.shippingFee),
+                    items: items,
                 }
-                items.push(purchaseItem)
+                createPurchase(purchase, response)
+                console.log("%j", purchase)
             }
         })
-        parser.on('error', (err) => {
-            console.error(err.message)
-        })
-        parser.write(purchaseFile.data);
-        parser.end()
-        const purchase = {
-            user: request.body.user,
-            purchaseDate: request.body.date,
-            shippingFee: request.body.shippingFee,
-            items:items,
-        }
-        console.log("%j",purchase)
-        response.json(purchase)
     }
 })
 
@@ -98,18 +100,34 @@ const getUsers = (request, response) => {
     })
 }
 
-const createPurchase = (request, response) => {
-    const { user, date, shipping_fee } = request.body
-    pool.query('INSERT INTO PURCHASES (User_Id, Creation_Date, Shipping_Fee) SELECT u.Id, $2, $3 FROM Users as u WHERE u.name = $1;', [user, date, shipping_fee], (error, result) => {
-        if (error) {
-            response.status(400).send(error)
-        } else {
-            response.status(201).send("Purchase created");
-        }
-    })
+const createPurchase = (purchase, response) => {
+    var purchaseId;
+    console.log("createPurchase:\n%j\n", purchase)
+    console.log([purchase.user, purchase.purchaseDate, purchase.shippingFee])
+    pool.query('INSERT INTO PURCHASES (User_Id, Creation_Date, Shipping_Fee) SELECT u.Id, $2, $3 FROM Users as u WHERE u.name = $1 RETURNING ID;',
+        [purchase.user, purchase.purchaseDate, purchase.shippingFee], (error, result) => {
+            if (error) {
+                console.log(error)
+                response.status(400).send(error)
+            } else {
+                let purchaseId = result.rows[0].id;
+                console.log("PURCHASE#:\n%d\n", purchaseId)
+                for (let i = 0; i < purchase.items.length; i++) {
+                    console.log([purchaseId, purchase.items[i].label, purchase.items[i].quantity, purchase.items[i].unitPrice, purchase.items[i].buyer])
+                    pool.query('INSERT INTO PURCHASE_ITEMS(Purchase_Id, Label, Quantity, Unit_Price, Buyer_Id) SELECT $1, $2, $3, $4, u.Id FROM Users AS u WHERE u.name = $5;',
+                        [purchaseId, purchase.items[i].label, purchase.items[i].quantity, purchase.items[i].unitPrice, purchase.items[i].buyer], (error, result) => {
+                            if (error) {
+                                console.log(error)
+                                response.status(400).send(error)
+                                return
+                            }
+                        })
+                }
+                response.status(201).send(`Purchase ${purchaseId} created`);
+            }
+        })
 }
 app.post('/users', createUser)
 app.get('/users', getUsers)
-app.post('/purchases', createPurchase)
 
 

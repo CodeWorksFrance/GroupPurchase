@@ -99,7 +99,8 @@ CREATE TABLE public.purchase_items (
     purchase_id integer NOT NULL,
     label character varying(100) NOT NULL,
     quantity integer NOT NULL,
-    buyer_id integer NOT NULL
+    buyer_id integer NOT NULL,
+    unit_price numeric(10,2) NOT NULL
 );
 
 
@@ -135,7 +136,7 @@ CREATE TABLE public.purchases (
     id integer NOT NULL,
     user_id integer NOT NULL,
     creation_date date NOT NULL,
-    shipping_fee money NOT NULL
+    shipping_fee numeric(10,2) NOT NULL
 );
 
 
@@ -253,7 +254,7 @@ COPY public.bills (id, user_id, creation_date) FROM stdin;
 -- Data for Name: purchase_items; Type: TABLE DATA; Schema: public; Owner: grouppurchaseadmin
 --
 
-COPY public.purchase_items (id, purchase_id, label, quantity, buyer_id) FROM stdin;
+COPY public.purchase_items (id, purchase_id, label, quantity, buyer_id, unit_price) FROM stdin;
 \.
 
 
@@ -270,6 +271,10 @@ COPY public.purchases (id, user_id, creation_date, shipping_fee) FROM stdin;
 --
 
 COPY public.users (id, name, birth_date) FROM stdin;
+7	Desmond	1998-05-04
+10	Alice	1997-12-20
+12	Bertrand	1999-04-18
+14	Clara	2001-08-01
 \.
 
 
@@ -298,14 +303,14 @@ SELECT pg_catalog.setval('public.purchase_items_id_seq', 1, false);
 -- Name: purchases_id_seq; Type: SEQUENCE SET; Schema: public; Owner: grouppurchaseadmin
 --
 
-SELECT pg_catalog.setval('public.purchases_id_seq', 1, false);
+SELECT pg_catalog.setval('public.purchases_id_seq', 9, true);
 
 
 --
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: grouppurchaseadmin
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 2, true);
+SELECT pg_catalog.setval('public.users_id_seq', 14, true);
 
 
 --
