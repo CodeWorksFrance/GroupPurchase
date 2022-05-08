@@ -82,5 +82,21 @@ const createUser = (request, response) => {
         }
     })
 }
+
+const getUsers = (request, response) => {
+    pool.query('SELECT * FROM USERS ORDER BY NAME ASC', (error, result) => {
+        if (error) {
+            response.status(400).send(error)
+        } else {
+            const users = []
+            for(let i=0; i < result.rows.length; i++) {
+                const user = { name: result.rows[i].name, birthDate: result.rows[i].birth_date }
+                users.push(user)
+            }
+            response.status(200).json(users)
+        }
+    })
+}
 app.post('/users', createUser)
+app.get('/users', getUsers)
 
