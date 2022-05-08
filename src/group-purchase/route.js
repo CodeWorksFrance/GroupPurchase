@@ -127,7 +127,43 @@ const createPurchase = (purchase, response) => {
             }
         })
 }
+
+const getPurchase = (request, response) => {
+    const id = parseInt(request.params.id)
+    pool.query('SELECT p.id, u.name, creation_date, shipping_fee FROM Purchases p INNER JOIN Users u ON u.id = p.user_id WHERE p.id = $1', [id], (error, result) => {
+        if(error) {
+            response.status(400).send(error)
+        } else {
+            const row = result.rows[0]
+            const purchase = {
+                id: row.id,
+                user: row.name,
+                creationDate: row.creation_date,
+                shippingFee: row.shipping_fee,
+                items: [],
+            }
+            pool.query('SELECT i.label, i.quantity, i.unit_price, u.name FROM Purchase_Items i INNER JOIN Users u ON u.id = i.buyer_id WHERE i.purchase_id = $1', [id], (error, result) => {
+                if (error) {
+                    response.status(400).send(error)
+                } else {
+                    result.rows.forEach( row => {
+                        const item = {
+                            label: row.label,
+                            quantity: row.quantity,
+                            unitPrice: row.unit_price,
+                            amount: row.quantity * row.unit_price,
+                            buyer: row.name,
+                        }
+                        purchase.items.push(item)
+                    })
+                    response.status(200).json(purchase)
+                }
+            })
+        }
+    })
+}
 app.post('/users', createUser)
 app.get('/users', getUsers)
+app.get('/purchases/:id', getPurchase)
 
 
