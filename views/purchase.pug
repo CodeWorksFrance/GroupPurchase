@@ -4,4 +4,23 @@ html
         title The Group purchase app
         link(rel='stylesheet' href='https://getbootstrap.com/docs/4.4/dist/css/bootstrap.min.css')
     body
-       h1 It works!!!
+
+           .modal-dialog
+               .modal-content
+                 .modal-body
+                   h1 Purchase
+                   div.form-group
+                    table.ui.celled.table.center.aligned
+                        tbody
+                            tr
+                                td User:
+                                td #{ purchase.user }
+                            tr
+                                td Date:
+                                td #{ (purchase.creationDate).toLocaleDateString("fr") }
+                            tr
+                                td Shipping:
+                                td #{ purchase.shippingFee }
+                            tr
+                                td Total:
+                                td #{ getTotal(purchase.items) }
