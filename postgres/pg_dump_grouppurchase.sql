@@ -305,7 +305,7 @@ SELECT pg_catalog.setval('public.purchases_id_seq', 1, false);
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: grouppurchaseadmin
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 1, false);
+SELECT pg_catalog.setval('public.users_id_seq', 2, true);
 
 
 --
@@ -322,6 +322,14 @@ ALTER TABLE ONLY public.bill_items
 
 ALTER TABLE ONLY public.bills
     ADD CONSTRAINT bill_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: users name_unique; Type: CONSTRAINT; Schema: public; Owner: grouppurchaseadmin
+--
+
+ALTER TABLE ONLY public.users
+    ADD CONSTRAINT name_unique UNIQUE (name);
 
 
 --

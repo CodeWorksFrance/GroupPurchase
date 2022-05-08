@@ -2,7 +2,14 @@ const express = require('express')
 const fileUpload = require('express-fileupload')
 const bodyParser = require('body-parser')
 const csvParse = require('csv-parse')
-
+const Pool = require('pg').Pool
+const pool = new Pool({
+    user: 'grouppurchaseadmin',
+    host: 'localhost',
+    database: 'grouppurchase',
+    password: 'butterfly',
+    port: 5432,
+})
 const app = express()
 const port = 3000
 
@@ -64,3 +71,16 @@ app.post('/upload', (request, response) => {
 app.listen(port, () => {
     console.log(`App running on port ${port}.`)
 })
+
+const createUser = (request, response) => {
+    const { name, birthDate } = request.body
+    pool.query('INSERT INTO USERS (name, birth_date) VALUES ($1, $2)', [name, birthDate], (error, result) => {
+        if(error) {
+            response.status(400).send(error)
+        } else {
+            response.status(201).send(`User added with ID: ${result.insertId}`)
+        }
+    })
+}
+app.post('/users', createUser)
+
