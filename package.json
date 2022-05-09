@@ -4,7 +4,7 @@
   "description": "Workshops on SRP and maybe DIP from SOLID principles",
   "main": "index.js",
   "scripts": {
-    "test": "jest",
+    "test": "./node_modules/mocha/bin/_mocha tests/**/*spec.js --reporter spec",
     "start": "node src/group-purchase/route.js"
   },
   "keywords": [
@@ -24,9 +24,11 @@
   ],
   "license": "GPL-3.0",
   "devDependencies": {
+    "chai": "^4.3.6",
     "csv-parse": "^5.0.4",
     "csv-parser": "^3.0.0",
-    "jest": "^28.1.0"
+    "jest": "^28.1.0",
+    "mocha": "^10.0.0"
   },
   "dependencies": {
     "body-parser": "^1.20.0",

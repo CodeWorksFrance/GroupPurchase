@@ -71,7 +71,7 @@ What's nice about the app is that it respects our birthday rule:
     ALTER ROLE grouppurchaseadmin CREATEDB;
 
     \q
-    psql -d postgres -U grouppurchase
+    psql -d postgres -U grouppurchaseadmin
     CREATE DATABASE GROUPPURCHASE;
     \q
     psql grouppurchase -f pg_dump_grouppurchase.sql
