@@ -20,7 +20,23 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(fileUpload({ createParentPath: true }))
 
 app.get('/', (request, response) => {
-    response.render("purchase", { numbers: [42,17,4807,23,51] })
+    response.render("index", {} )
+})
+
+app.get('/users', (request, response) =>
+{
+    pool.query('SELECT * FROM USERS ORDER BY NAME ASC', (error, result) => {
+        if (error) {
+            response.status(400).send(error)
+        } else {
+            const users = []
+            for (let i = 0; i < result.rows.length; i++) {
+                const user = {name: result.rows[i].name, birthDate: result.rows[i].birth_date}
+                users.push(user)
+            }
+            response.render("users", {users: users })
+        }
+    })
 })
 
 app.get('/purchase/:id', (request, response) => {
@@ -132,18 +148,6 @@ const createUser = (request, response) => {
 }
 
 const getUsers = (request, response) => {
-    pool.query('SELECT * FROM USERS ORDER BY NAME ASC', (error, result) => {
-        if (error) {
-            response.status(400).send(error)
-        } else {
-            const users = []
-            for(let i=0; i < result.rows.length; i++) {
-                const user = { name: result.rows[i].name, birthDate: result.rows[i].birth_date }
-                users.push(user)
-            }
-            response.status(200).json(users)
-        }
-    })
 }
 
 const createPurchase = (purchase, response) => {
