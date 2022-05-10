@@ -1,0 +1,4 @@
+    item              , unitp  , qty , amount , buyer
+    pencils           ,   0.10 ,  10 ,  1.00 , Bertrand
+    pencils           ,   0.10 ,  10 ,  1.00 , Clara
+    pencils           ,   0.10 ,  10 ,  1.00 , Alice

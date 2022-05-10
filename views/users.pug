@@ -17,13 +17,14 @@ html
                                 label(for="date") Date of Birth:
                                 input#date.form-control(type="date", name="date", required)
                             button.btn.btn-primary(type="submit", name="new-user") Confirm
+                            button.btn.btn-primary(onclick="window.location.href='/'") Cancel
 
                         table.ui.celled.table.center.aligned
-                            tbody
-                                tr
-                                    th Name
-                                    th Date
-                                each user in users
-                                    tr
-                                        td #{ user.name }
-                                        td #{ (user.birthDate).toLocaleDateString("fr") }
+                                                tbody
+                                                    tr
+                                                        th Name
+                                                        th Date
+                                                    each user in users
+                                                        tr
+                                                            td #{ user.name }
+                                                            td #{ (user.birthDate).toLocaleDateString("fr") }

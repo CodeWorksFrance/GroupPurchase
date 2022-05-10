@@ -20,7 +20,22 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(fileUpload({ createParentPath: true }))
 
 app.get('/', (request, response) => {
-    response.render("index", {} )
+    pool.query('SELECT p.Id, u.Name, creation_date FROM Purchases p INNER JOIN Users u ON u.id = p.user_id ORDER BY creation_date DESC', (error,result) => {
+        if (error) {
+            response.status(400).send(error)
+        } else {
+            const purchases = []
+            for (let i = 0; i < result.rows.length; i++) {
+                const purchase = {
+                    id: result.rows[i].id,
+                    user: result.rows[i].name,
+                    creationDate: result.rows[i].creation_date
+                }
+                purchases.push(purchase)
+            }
+            response.render("index", {purchases: purchases})
+        }
+    })
 })
 
 app.get('/users', (request, response) =>

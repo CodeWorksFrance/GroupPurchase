@@ -17,3 +17,20 @@ html
                                         button.btn.btn-primary(onclick="window.location.href='/new'") New Group Purchase
                                     td
                                         button.btn.btn-primary(onclick="window.location.href='/users'") Users
+                        table.ui.celled.table.center.aligned
+                            tbody
+                                tr
+                                    th  Id
+                                    th  User
+                                    th  Date
+                                each purchase in purchases
+                                    tr
+                                        td #{ purchase.id }
+                                        td #{ purchase.user }
+                                        td #{ (purchase.creationDate).toLocaleDateString("fr") }
+                                        td
+                                            button.btn.btn-primary(onclick="window.location.href='/purchase/"+ purchase.id +"'") Detail
+
+
+
+
