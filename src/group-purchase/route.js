@@ -179,6 +179,18 @@ const createPurchase = (purchase, response) => {
 }
 
 app.post('/users', createUser)
+
+app.post('/newUser', (request, response) => {
+    const {user, date} = request.body
+    pool.query('INSERT INTO USERS (name, birth_date) VALUES ($1, $2)', [user, date], (error, result) => {
+        if (error) {
+            response.status(400).send(error)
+        } else {
+            response.redirect('/users')
+        }
+    })
+})
+
 app.get('/users', getUsers)
 
 const computeBills = (items, shippingFee) => {

@@ -9,6 +9,15 @@ html
                 .modal-body
                     div.purchase
                         h3 Users
+                        form(ref="newUserForm" id="uploadForm" role="form" method="POST" action="/newUser" enctype="multipart/form-data")
+                            div.form-group
+                                label(for="user") User:
+                                input#name.form-control(type="text", placeholder="user", name="user", required )
+                            div.form-group
+                                label(for="date") Date of Birth:
+                                input#date.form-control(type="date", name="date", required)
+                            button.btn.btn-primary(type="submit", name="new-user") Confirm
+
                         table.ui.celled.table.center.aligned
                             tbody
                                 tr
