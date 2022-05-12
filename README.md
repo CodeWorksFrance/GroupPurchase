@@ -45,7 +45,6 @@ Buyer    | Amount
 ---------+-------
 Alice    |  39.98
 Bertrand |  19.19
-
 Clara    | 490.38
 Desmond  |  95.95
 ---------+-------
@@ -71,7 +70,7 @@ What's nice about the app is that it respects our birthday rule:
     ALTER ROLE grouppurchaseadmin CREATEDB;
 
     \q
-    psql -d postgres -U grouppurchase
+    psql -d postgres -U grouppurchaseadmin
     CREATE DATABASE GROUPPURCHASE;
     \q
     psql grouppurchase -f pg_dump_grouppurchase.sql
