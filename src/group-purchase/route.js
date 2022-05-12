@@ -19,10 +19,6 @@ app.use(bodyParser.urlencoded({ extended: true }))
 // enable files upload
 app.use(fileUpload({ createParentPath: true }))
 
-app.get('/', (request, response) => {
-    response.render("purchase", { numbers: [42,17,4807,23,51] })
-})
-
 app.get('/purchase/:id', (request, response) => {
     const id = parseInt(request.params.id)
     pool.query('SELECT p.id, u.name, creation_date, shipping_fee FROM Purchases p INNER JOIN Users u ON u.id = p.user_id WHERE p.id = $1', [id], (error, result) => {
@@ -206,3 +202,5 @@ const computeBills = (items, shippingFee) => {
     }
     return result
 }
+
+module.exports = app;
