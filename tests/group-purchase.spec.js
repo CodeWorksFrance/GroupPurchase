@@ -1,41 +1,22 @@
 const request = require('supertest');
-//var app = require('../src/group-purchase/route');
-const express = require('express');
-const app = express();
-
-app.get('/users', (req, res) => {
-    res.status(200)
-});
 
 describe('Group purchases main page', function() {
-    it('Should return 404 when accessing main page', function() {
-        request(app)
-            .get('/users')
+    it('Smoke testing an external & public API', function(done) {
+        request('https://dog.ceo')
+            .get('/api/breed/hound/list')
             .expect(200)
-            .end(function(err, res) {
-                if (err) throw err;
+            .expect(response => {
+                expect(response.body.message).toEqual(expect.arrayContaining([
+                    'afghan',
+                    'basset',
+                    'blood',
+                    'english',
+                    'ibizan',
+                    'plott',
+                    'walker'
+                ]))
+                expect(response.body.status).toEqual('success')
             })
+            .end(done)
     });
 });
-
-/*
-const request = require(‘supertest’);
-const assert = require(‘assert’);
-const express = require(‘express’);
-const app = express();
-app.get(‘/user’, function(req, res) {
-  res.status(200).json({ name: ‘john’) }
-});
-describe(“my first test”, () => {
-    it(“should pass”, () => {
-        request(app)
-          .get(‘/user’)
-          .expect(‘Content-Type’, /json/)
-          .expect(‘Content-Length’, ‘15’)
-          .expect(200)
-          .end(function(err, res) {
-            if (err) throw err;
-          })
-    })
-  });
-  */
