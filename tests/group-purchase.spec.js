@@ -19,4 +19,14 @@ describe('Group purchases main page', function() {
             })
             .end(done)
     });
+    it('Testing with localhost', (done) => {
+        request('http://localhost:3000')
+            .get('/new')
+            .expect(200)
+            .expect(response => {
+                expect(response.text).not.toBeNull()
+            })
+            .end(done)
+
+    });
 });
