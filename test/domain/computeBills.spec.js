@@ -12,4 +12,12 @@ describe('computeBills', () => {
                 { label: "pencil", unitPrice: 1.0, quantity: 5, buyer: 'Clara' }]}
         expect(computeBills(purchase)).toStrictEqual([{ buyer: 'Clara', amount: 50.0, shipping: 10.0, total: 60.0}])
     })
+    it('should create several bills for a purchase of several items by several persons, with 0 shipping fee', () => {
+        const purchase = { shippingFee: 0.0, items: [
+                { label: "paper", unitPrice: 4.5, quantity: 10, buyer: 'Clara' },
+                { label: "pencil", unitPrice: 1.0, quantity: 5, buyer: 'Clara' },
+                { label: "flowers", unitPrice: 4.0, quantity: 3, buyer: 'Desmond' }]}
+        expect(computeBills(purchase)).toStrictEqual([{ buyer: 'Clara', amount: 50.0, shipping: 0.0, total: 50.0},
+                                                               { buyer: 'Desmond', amount: 12.0, shipping: 0.0, total: 12.0}])
+    })
 })

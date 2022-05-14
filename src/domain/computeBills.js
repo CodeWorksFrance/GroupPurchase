@@ -1,10 +1,15 @@
 const computeBills = (purchase) => {
-    const bill = { buyer: purchase.items[0].buyer, amount: 0, shipping: purchase.shippingFee, total: 0 }
+    const amounts = {}
     purchase.items.forEach(item => {
-        bill.amount += item.unitPrice * item.quantity
-        bill.total = bill.amount + purchase.shippingFee
+        if(!amounts[item.buyer])
+            amounts[item.buyer] = 0
+        amounts[item.buyer] += item.unitPrice * item.quantity
     })
-    return [bill]
+    const bills = []
+    for(const key of Object.keys(amounts)) {
+        bills.push({buyer: key, amount: amounts[key], shipping: purchase.shippingFee, total: amounts[key] + purchase.shippingFee})
+    }
+    return bills
 }
 
 module.exports = computeBills
