@@ -1,8 +1,9 @@
 const computeBills = (purchase) => {
-    const item = purchase.items[0]
-    const amount = item.unitPrice * item.quantity
-    const total = amount + purchase.shippingFee
-    const bill = { buyer: item.buyer, amount: amount, shipping: purchase.shippingFee, total: total }
+    const bill = { buyer: purchase.items[0].buyer, amount: 0, shipping: purchase.shippingFee, total: 0 }
+    purchase.items.forEach(item => {
+        bill.amount += item.unitPrice * item.quantity
+        bill.total = bill.amount + purchase.shippingFee
+    })
     return [bill]
 }
 
