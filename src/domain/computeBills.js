@@ -1,13 +1,19 @@
 const computeBills = (purchase) => {
     const amounts = {}
+    let grandTotal = 0
     purchase.items.forEach(item => {
         if(!amounts[item.buyer])
             amounts[item.buyer] = 0
-        amounts[item.buyer] += item.unitPrice * item.quantity
+        const amount = item.unitPrice * item.quantity
+        amounts[item.buyer] += amount
+        grandTotal += amount
     })
     const bills = []
     for(const key of Object.keys(amounts)) {
-        bills.push({buyer: key, amount: amounts[key], shipping: purchase.shippingFee, total: amounts[key] + purchase.shippingFee})
+        const amount = amounts[key]
+        const shipping = purchase.shippingFee * (amount / grandTotal)
+        const total = amount + shipping
+        bills.push({ buyer: key, amount: amount, shipping: shipping, total: total })
     }
     return bills
 }
