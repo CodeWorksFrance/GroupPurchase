@@ -28,4 +28,14 @@ describe('computeBills', () => {
             [{ buyer: 'Clara', amount: 90.0, shipping: 9.0, total: 99.0},
                 { buyer: 'Desmond', amount: 10.0, shipping: 1.0, total: 11.0}])
     })
+    it('should create several bills for several buyers with correct rounding of shipping fee', () => {
+        const purchase = { shippingFee: 10.0, items: [
+                { label: "paper", unitPrice: 10.0, quantity: 3, buyer: 'Clara' },
+                { label: "flowers", unitPrice: 15.0, quantity: 2, buyer: 'Desmond' },
+                { label: "pencil", unitPrice: 3.0, quantity: 10, buyer: 'Elrod' }] }
+        expect(computeBills(purchase)).toStrictEqual(
+            [{ buyer: 'Clara', amount: 30.0, shipping: 3.33, total: 33.33},
+                { buyer: 'Desmond', amount: 30.0, shipping: 3.34, total: 33.34 },
+                { buyer: 'Elrod', amount: 30, shipping: 3.33, total: 33.33 }])
+    })
 })

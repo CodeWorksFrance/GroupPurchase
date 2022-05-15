@@ -9,9 +9,15 @@ const computeBills = (purchase) => {
         grandTotal += amount
     })
     const bills = []
+    let runningTotal = 0.0
+    let runningRounded = 0.0
+    const rounded = (n) => Math.round(n * 100) / 100
     for(const key of Object.keys(amounts)) {
         const amount = amounts[key]
-        const shipping = purchase.shippingFee * (amount / grandTotal)
+        runningTotal += purchase.shippingFee * (amount / grandTotal)
+        const roundedTotal = rounded(runningTotal)
+        const shipping = roundedTotal - runningRounded
+        runningRounded += shipping
         const total = amount + shipping
         bills.push({ buyer: key, amount: amount, shipping: shipping, total: total })
     }
