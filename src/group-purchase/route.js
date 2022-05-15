@@ -43,6 +43,15 @@ app.get('/', (request, response) => {
     })
 })
 
+app.get('/foo', (request, response) => {
+    let callBack = (result, error) => {
+        console.log("I called query and now I'm back with %j", result)
+        response.status(200).json({result})
+        return result
+    }
+    const promise = pool.query('SELECT 1;') // calling query without callback => returns a promise
+    promise.then(callBack)                  // what to do with query result
+})
 app.get('/users', (request, response) =>
 {
     userRepository.retrieveUsers((error, users) => {
