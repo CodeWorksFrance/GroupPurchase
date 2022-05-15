@@ -144,11 +144,11 @@ app.listen(port, () => {
 
 const createUser = (request, response) => {
     const { name, birthDate } = request.body
-    pool.query('INSERT INTO USERS (name, birth_date) VALUES ($1, $2)', [name, birthDate], (error, result) => {
+    userRepository.createUser(name, birthDate, (error, user) => {
         if(error) {
             response.status(400).send(error)
         } else {
-            response.status(201).send(`User added with ID: ${result.insertId}`)
+            response.status(201).send(`User added with ID: ${user.id}`)
         }
     })
 }
