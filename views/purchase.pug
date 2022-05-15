@@ -51,13 +51,9 @@ html
                                     th Amount
                                     th Shipping
                                     th Total
-                                    if showRunningTotal
-                                        th Running
                                 each bill in bills
                                     tr
                                         td #{ bill.buyer }
                                         td(style="text-align:right") #{ bill.amount.toFixed(2) }
                                         td(style="text-align:right") #{ bill.shipping.toFixed(2)  }
                                         td(style="text-align:right") #{ bill.total.toFixed(2)  }
-                                        if showRunningTotal
-                                            td(style="text-align:right") #{ bill.running.toFixed(2)  }

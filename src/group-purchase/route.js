@@ -3,6 +3,7 @@ const fileUpload = require('express-fileupload')
 const bodyParser = require('body-parser')
 const csvParse = require('csv-parse')
 const Pool = require('pg').Pool
+const computeBills = require('../../src/domain/computeBills')
 const pool = new Pool({
     user: 'grouppurchaseadmin',
     host: 'localhost',
@@ -91,7 +92,7 @@ app.get('/purchase/:id', (request, response) => {
                             })
                             return result
                         },
-                        bills: computeBills(purchase.items, purchase.shippingFee),
+                        bills: computeBills(purchase),
                         showRunningTotal: true })
                 }
             })
@@ -208,32 +209,3 @@ app.post('/newUser', (request, response) => {
 
 app.get('/users', getUsers)
 
-const computeBills = (items, shippingFee) => {
-    const bills = []
-    var grand_total = 0
-    items.forEach(item => {
-        if(!bills[item.buyer]) {
-            bills[item.buyer] = { amount: 0 }
-        }
-        bills[item.buyer].amount += item.amount
-        grand_total += item.amount
-    })
-    const result = []
-    let total_fee = 0;
-    let rounded_total_fee = 0
-    let rounded_total = 0
-    let running_total = 0
-    const rounded = (n) => {
-        return (Math.round(n*100) / 100)
-    }
-    for(const key of Object.keys(bills)) {
-        const fee = shippingFee * bills[key].amount / grand_total
-        total_fee += fee
-        const rounded_fee = rounded(total_fee) - rounded_total_fee
-        rounded_total_fee += rounded_fee
-        const total = bills[key].amount + rounded_fee
-        running_total += total
-        result.push({ buyer:key, amount: bills[key].amount, shipping: rounded_fee, total: total, running: running_total })
-    }
-    return result
-}
