@@ -5,6 +5,8 @@ const csvParse = require('csv-parse')
 const Pool = require('pg').Pool
 const computeBills = require('../../src/domain/computeBills')
 const importItems = require("../domain/importItems");
+const UserRepository = require("../repository/userRepository")
+const DataTransfer = require("../repository/dataTransfer")
 const pool = new Pool({
     user: 'grouppurchaseadmin',
     host: 'localhost',
@@ -14,6 +16,7 @@ const pool = new Pool({
 })
 const app = express()
 const port = 3000
+const userRepository = new UserRepository(new DataTransfer(pool))
 
 app.set("view engine", "pug")
 app.use(bodyParser.json())
@@ -42,16 +45,11 @@ app.get('/', (request, response) => {
 
 app.get('/users', (request, response) =>
 {
-    pool.query('SELECT * FROM USERS ORDER BY NAME ASC', (error, result) => {
-        if (error) {
+    userRepository.retrieveUsers((error, users) => {
+        if(error) {
             response.status(400).send(error)
         } else {
-            const users = []
-            for (let i = 0; i < result.rows.length; i++) {
-                const user = {name: result.rows[i].name, birthDate: result.rows[i].birth_date}
-                users.push(user)
-            }
-            response.render("users", {users: users })
+            response.render("users", { users: users })
         }
     })
 })

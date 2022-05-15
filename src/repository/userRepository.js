@@ -1,12 +1,12 @@
 UserRepository = class {
-    constructor(concreteRepository) {
-        this.concreteRepository = concreteRepository
+    constructor(dataTransfer) {
+        this.dataTransfer = dataTransfer
     }
     createUser = (name, birthDate) => {
-        return this.concreteRepository.createUser(name, birthDate)
+        return this.dataTransfer.createUser(name, birthDate)
     }
-    retrieveUsers = () => {
-        return this.concreteRepository.retrieveUsers()
+    retrieveUsers = (callBack) => {
+        this.dataTransfer.retrieveUsers(callBack)
     }
 }
 
