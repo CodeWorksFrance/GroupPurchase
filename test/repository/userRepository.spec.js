@@ -2,24 +2,33 @@ const UserRepository = require("../../src/repository/userRepository");
 const MockDataTransfer = require("./mockDataTransfer");
 const Pool = require('pg').Pool
 const DataTransfer = require("../../src/repository/dataTransfer")
-const pool = new Pool({
-    user: 'grouppurchaseadmin',
-    host: 'localhost',
-    database: 'grouppurchase',
-    password: 'butterfly',
-    port: 5432,
-})
 
 describe('UserRepository', function () {
+    let pool
     let dataTransfer
     let repository
 
     beforeAll( () => {
-        dataTransfer = new MockDataTransfer() // DataTransfer(pool)
+        const pool = new Pool({
+            user: 'grouppurchaseadmin',
+            host: 'localhost',
+            database: 'grouppurchase',
+            password: 'butterfly',
+            port: 5432,
+        })
+        dataTransfer = new MockDataTransfer()
+    })
+    afterAll( () => {
+        if(pool) {
+            pool.end()
+        }
     })
 
     beforeEach(() => {
         repository = new UserRepository(dataTransfer)
+    })
+    it('can test a simple assertion', () => {
+        expect(2+2).toStrictEqual(4)
     })
 
     it('can create a user and give it a distinct id', () => {
