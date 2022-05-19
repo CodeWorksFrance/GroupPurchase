@@ -27,9 +27,6 @@ describe('UserRepository', function () {
     beforeEach(() => {
         repository = new UserRepository(dataTransfer)
     })
-    it('can test a simple assertion', () => {
-        expect(2+2).toStrictEqual(4)
-    })
 
     it('can create a user and give it a distinct id', () => {
         repository.createUser('Clara', new Date(1998, 10, 23), (error, user) => {
@@ -46,13 +43,14 @@ describe('UserRepository', function () {
         repository.createUser('Clara', new Date(1998, 10,23), (error, user) => {} )
         repository.createUser('Desmond', new Date(2000, 9, 10), (error, user) => {} )
         repository.createUser('Alice', new Date(1999,4, 17), (error, user) => {} )
-        repository.retrieveUsers((error, users) => {
-            expect(users).toStrictEqual( [
+        repository.retrieveUsers((error, result) => {
+            expect(result).toStrictEqual([
                 { name: 'Alice', birthDate: new Date(1999,4,17), id: 3 },
                 { name: 'Clara', birthDate: new Date(1998,10,23), id: 1},
                 { name: 'Desmond', birthDate: new Date(2000,9,10), id: 2}])
         })
     })
+
     it('return an error when trying to create an existing user', () => {
         repository.createUser('Clara', new Date(1998, 10,23), (error, user) => {})
         repository.createUser('Clara', new Date(2005, 7, 28), (error, user) => {
