@@ -4,10 +4,23 @@ html
         title The Group purchase app
         link(rel='stylesheet' href='https://getbootstrap.com/docs/4.4/dist/css/bootstrap.min.css')
     body
+    .container.py-3
+      header
+        .d-flex.flex-column.flex-md-row.align-items-center.pb-3.mb-4.border-bottom
+          a.d-flex.align-items-center.text-dark.text-decoration-none(href='/')
+            span.fs-4 The Group purchase app
+        .pricing-header.p-3.pb-md-4.mx-auto.text-center
+          h1.display-4.fw-normal New group
+          p.fs-5.text-muted
+            | Create a new group purchase
+      main
            .modal-dialog
                .modal-content
                  .modal-body
                    form(ref="uploadForm" id="uploadForm" role="form" method="POST" action="/upload" enctype="multipart/form-data")
+                     div.form-group
+                        label(for="groupname") Group name:
+                        input#name.form-control(type="text", placeholder="Name of the new group purchase", name="groupname", required, value="Clara moving in")
                      div.form-group
                        label(for="user") User:
                        input#name.form-control(type="text", placeholder="user", name="user", required, value="Clara")
