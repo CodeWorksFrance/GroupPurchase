@@ -72,6 +72,37 @@ What's nice about the app is that it respects our birthday rule:
     \q
     psql -d postgres -U grouppurchaseadmin
     CREATE DATABASE GROUPPURCHASE;
-    \q
-    psql grouppurchase -f pg_dump_grouppurchase.sql
+
+## Initialize tables data
+
+To have a running app, you need to initialize the tables.
+Go to the project workspace 
+```
+ cd [your-local-path]/back_to_basics
+```
+
+You should have this hierarchy: 
+```
+ls -l
+total 696
+...
+drwxr-xr-x    3 michelleavomo  staff      96 11 mai 13:12 postgres
+... 
+
+```
+The file you need to populate your table is inside the postgres folder as shown below:
+```
+ls -l postgres
+total 24
+-rw-r--r--  1 michelleavomo  staff  9277 11 mai 13:12 pg_dump_grouppurchase.sql
+```
+
+Then from that path, execute the command below: 
+ ```
+  psql grouppurchase -f pg_dump_grouppurchase.sql
+
+ ```
+
+Now run you app. It works when your homepage (http://localhost:3000) looks like below: 
+![img_1.png](img_1.png)
 
