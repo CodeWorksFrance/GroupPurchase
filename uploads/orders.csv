@@ -1,8 +1,8 @@
-    item              , unitp  , qty , amount , buyer,project
-    pencils           ,   0.50 ,  20 ,  10.00 , Bertrand,Paper planes contest
-    paper             ,   1.50 ,  25 ,  37.50 , Alice,Paper planes contest
-    paper             ,   1.80 ,  50 ,  90.00 , Desmond,Paper planes contest
-    laundry detergent ,   2.00 ,  10 ,  20.00 , Clara,Paper planes contest
-    trash bags        ,   4.30 , 100 , 430.00 , Clara,Paper planes contest
-    gift cards        ,   8.00 ,   1 ,   8.00 , Bertrand,Paper planes contest
-    lightbulbs        ,   1.00 ,  10 ,  10.00 , Clara,Paper planes contest
+    item              , unitp  , qty , amount , buyer
+    pencils           ,   0.50 ,  20 ,  10.00 , Bertrand
+    paper             ,   1.50 ,  25 ,  37.50 , Alice
+    paper             ,   1.80 ,  50 ,  90.00 , Desmond
+    laundry detergent ,   2.00 ,  10 ,  20.00 , Clara
+    trash bags        ,   4.30 , 100 , 430.00 , Clara
+    gift cards        ,   8.00 ,   1 ,   8.00 , Bertrand
+    lightbulbs        ,   1.00 ,  10 ,  10.00 , Clara

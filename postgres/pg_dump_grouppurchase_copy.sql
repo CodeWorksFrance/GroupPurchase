@@ -10,7 +10,7 @@ SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
+--SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
@@ -238,89 +238,78 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 -- Data for Name: bill_items; Type: TABLE DATA; Schema: public; Owner: grouppurchaseadmin
 --
 
-COPY public.bill_items (id, buyer_id, amount) FROM stdin;
-\.
+--COPY public.bill_items (id, buyer_id, amount) FROM stdin;
+--\.
 
 
 --
 -- Data for Name: bills; Type: TABLE DATA; Schema: public; Owner: grouppurchaseadmin
 --
 
-COPY public.bills (id, user_id, creation_date) FROM stdin;
-\.
+--COPY public.bills (id, user_id, creation_date) FROM stdin;
+--\.
 
 
 --
 -- Data for Name: purchase_items; Type: TABLE DATA; Schema: public; Owner: grouppurchaseadmin
 --
 
-COPY public.purchase_items (id, purchase_id, label, quantity, buyer_id, unit_price) FROM stdin;
-\.
+--COPY public.purchase_items (id, purchase_id, label, quantity, buyer_id, unit_price) FROM stdin;
+--\.
 
 
 --
 -- Data for Name: purchases; Type: TABLE DATA; Schema: public; Owner: grouppurchaseadmin
 --
 
-COPY public.purchases (id, user_id, creation_date, shipping_fee) FROM stdin;
-\.
+--COPY public.purchases (id, user_id, creation_date, shipping_fee) FROM stdin;
+--\.
 
 
 --
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: grouppurchaseadmin
 --
 
-COPY public.users (id, name, birth_date) FROM stdin;
-7	Desmond	1998-05-04
-10	Alice	1997-12-20
-12	Bertrand	1999-04-18
-14	Clara	2001-08-01
-\.
-
---
--- Data for Name: groupped_purchases; Type: TABLE DATA; Schema: public; Owner: grouppurchaseadmin
---
-
-COPY public.groupped_purchases (id, project_name, creation_date) FROM stdin;
-1	Drawing walls	2022-05-04
-25	Paper planes contest	2021-10-20
-40	Decoration Day	2022-04-18
-\.
-
+--COPY public.users (id, name, birth_date) FROM stdin;
+--7	Desmond	1998-05-04
+--10	Alice	1997-12-20
+--12	Bertrand	1999-04-18
+--14	Clara	2001-08-01
+--\.
 
 --
 -- Name: bill_id_seq; Type: SEQUENCE SET; Schema: public; Owner: grouppurchaseadmin
 --
 
-SELECT pg_catalog.setval('public.bill_id_seq', 1, false);
+--SELECT pg_catalog.setval('public.bill_id_seq', 1, false);
 
 
 --
 -- Name: bill_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: grouppurchaseadmin
 --
 
-SELECT pg_catalog.setval('public.bill_items_id_seq', 1, false);
+--SELECT pg_catalog.setval('public.bill_items_id_seq', 1, false);
 
 
 --
 -- Name: purchase_items_id_seq; Type: SEQUENCE SET; Schema: public; Owner: grouppurchaseadmin
 --
 
-SELECT pg_catalog.setval('public.purchase_items_id_seq', 1, false);
+--SELECT pg_catalog.setval('public.purchase_items_id_seq', 1, false);
 
 
 --
 -- Name: purchases_id_seq; Type: SEQUENCE SET; Schema: public; Owner: grouppurchaseadmin
 --
 
-SELECT pg_catalog.setval('public.purchases_id_seq', 9, true);
+--SELECT pg_catalog.setval('public.purchases_id_seq', 9, true);
 
 
 --
 -- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: grouppurchaseadmin
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 14, true);
+--SELECT pg_catalog.setval('public.users_id_seq', 14, true);
 
 
 --
@@ -415,7 +404,7 @@ ALTER TABLE ONLY public.bills
 
 CREATE TABLE public.groupped_purchases (
                                            id integer NOT NULL,
-                                           project_name integer NOT NULL,
+                                           project_name varchar(20) NOT NULL,
                                            creation_date date NOT NULL
 );
 
@@ -451,9 +440,17 @@ ALTER TABLE IF EXISTS ONLY public.groupped_purchases
     ADD CONSTRAINT groupped_purchase_fk PRIMARY KEY (id);
 
 ALTER TABLE public.purchases
-    ADD CONSTRAINT ref_project FOREIGN KEY(groupped_purchase_id) references public.groupped_purchases(id)
+    ADD CONSTRAINT ref_project FOREIGN KEY(groupped_purchase_id) references public.groupped_purchases(id);
 
 
+--
+-- Data for Name: groupped_purchases; Type: TABLE DATA; Schema: public; Owner: grouppurchaseadmin
+--
+INSERT INTO public.groupped_purchases (id, project_name, creation_date)
+values
+    (1, 'Drawing walls', '2022-05-04'),
+    (25, 'Paper planes contest', '2022-05-04'),
+    (40, 'Decoration Day', '2022-05-04');
 --
 -- PostgreSQL database dump complete
 --

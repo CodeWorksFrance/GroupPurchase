@@ -25,7 +25,7 @@ app.use(bodyParser.urlencoded({ extended: true }))
 app.use(fileUpload({ createParentPath: true }))
 
 app.get('/', (request, response) => {
-    pool.query('SELECT p.Id, u.Name, creation_date FROM Purchases p INNER JOIN Users u ON u.id = p.user_id ORDER BY creation_date DESC', (error,result) => {
+    pool.query('SELECT p.Id, u.Name, u.creation_date FROM Purchases p INNER JOIN Users u ON u.id = p.user_id ORDER BY creation_date DESC', (error,result) => {
         if (error) {
             console.log(error)
             response.status(400).send(error)
