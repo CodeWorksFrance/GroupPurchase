@@ -59,7 +59,7 @@ What's nice about the app is that it respects our birthday rule:
 # Database Setup
 
     brew install postgresql
-    brew services start portgresql
+    brew services start postgresql
     psql postgres
     \dt
     postgres=# \conninfo

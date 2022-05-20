@@ -136,7 +136,8 @@ CREATE TABLE public.purchases (
     id integer NOT NULL,
     user_id integer NOT NULL,
     creation_date date NOT NULL,
-    shipping_fee numeric(10,2) NOT NULL
+    shipping_fee numeric(10,2) NOT NULL,
+    groupped_purchase_id integer NOT NULL
 );
 
 
@@ -197,7 +198,6 @@ ALTER TABLE public.users_id_seq OWNER TO grouppurchaseadmin;
 --
 
 ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
-
 
 --
 -- Name: bill_items id; Type: DEFAULT; Schema: public; Owner: grouppurchaseadmin
@@ -275,6 +275,16 @@ COPY public.users (id, name, birth_date) FROM stdin;
 10	Alice	1997-12-20
 12	Bertrand	1999-04-18
 14	Clara	2001-08-01
+\.
+
+--
+-- Data for Name: groupped_purchases; Type: TABLE DATA; Schema: public; Owner: grouppurchaseadmin
+--
+
+COPY public.groupped_purchases (id, project_name, creation_date) FROM stdin;
+1	Drawing walls	2022-05-04
+25	Paper planes contest	2021-10-20
+40	Decoration Day	2022-04-18
 \.
 
 
@@ -401,8 +411,48 @@ ALTER TABLE ONLY public.bills
     ADD CONSTRAINT ref_user FOREIGN KEY (user_id) REFERENCES public.users(id);
 
 
-ALTER TABLE ONLY public.purchases
-    ADD COLUMN group_purchase_name varchar(20);
+--- Everything about the groupped_purchase table and relations
+
+CREATE TABLE public.groupped_purchases (
+                                           id integer NOT NULL,
+                                           project_name integer NOT NULL,
+                                           creation_date date NOT NULL
+);
+
+ALTER TABLE public.groupped_purchases OWNER TO grouppurchaseadmin;
+--
+-- Name: groupped_purchases_id_seq; Type: SEQUENCE; Schema: public; Owner: grouppurchaseadmin
+--
+
+CREATE SEQUENCE public.groupped_purchases_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE IF EXISTS public.groupped_purchases_id_seq OWNER TO grouppurchaseadmin;
+
+--
+-- Name: groupped_purchases_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: grouppurchaseadmin
+--
+
+ALTER SEQUENCE IF EXISTS public.groupped_purchases_id_seq OWNED BY public.groupped_purchases.id;
+
+--
+-- Name: groupped_purchases id; Type: DEFAULT; Schema: public; Owner: grouppurchaseadmin
+--
+
+ALTER TABLE IF EXISTS ONLY public.groupped_purchases ALTER COLUMN id SET DEFAULT nextval('public.groupped_purchases_id_seq'::regclass);
+
+ALTER TABLE IF EXISTS ONLY public.groupped_purchases
+    ADD CONSTRAINT groupped_purchase_fk PRIMARY KEY (id);
+
+ALTER TABLE public.purchases
+    ADD CONSTRAINT ref_project FOREIGN KEY(groupped_purchase_id) references public.groupped_purchases(id)
+
 
 --
 -- PostgreSQL database dump complete

@@ -67,14 +67,15 @@ app.get('/users', (request, response) =>
 
 app.get('/purchase/:id', (request, response) => {
     const id = parseInt(request.params.id)
-    pool.query('SELECT p.id, u.name, creation_date, shipping_fee FROM Purchases p INNER JOIN Users u ON u.id = p.user_id WHERE p.id = $1', [id], (error, result) => {
+    pool.query('SELECT p.id, u.name, p.creation_date, p.shipping_fee, p.group_purchase_name FROM Purchases p INNER JOIN Users u ON u.id = p.user_id WHERE p.id = $1', [id], (error, result) => {
         if (error || result.rows.length === 0) {
             response.status(400).send(error)
         } else {
             const row = result.rows[0]
             const purchase = {
                 id: row.id,
-                user: row.name,
+                name: row.group_purchase_name,
+                owner: row.name,
                 creationDate: row.creation_date,
                 shippingFee: row.shipping_fee,
                 items: [],
@@ -128,7 +129,8 @@ app.post('/upload', (request, response) => {
             } else {
                 const items = importItems(purchaseFile.data);
                 const purchase = {
-                    user: request.body.user,
+                    name: request.body.project,
+                    owner: request.body.user,
                     purchaseDate: request.body.date,
                     shippingFee: Number.parseFloat(request.body.shippingFee),
                     items: items,
