@@ -16,7 +16,6 @@ DataTransfer = class {
             })
     }
 
-
    retrieveUsers = (callBack) => {
        this.pool.query('SELECT * FROM USERS ORDER BY NAME ASC', (error, result) => {
            const users = []

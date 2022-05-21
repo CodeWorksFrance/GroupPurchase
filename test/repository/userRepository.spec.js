@@ -2,21 +2,31 @@ const UserRepository = require("../../src/repository/userRepository");
 const MockDataTransfer = require("./mockDataTransfer");
 const Pool = require('pg').Pool
 const DataTransfer = require("../../src/repository/dataTransfer")
-const pool = new Pool({
-    user: 'grouppurchaseadmin',
-    host: 'localhost',
-    database: 'grouppurchase',
-    password: 'butterfly',
-    port: 5432,
-})
 
 describe('UserRepository', function () {
+    let pool
     let dataTransfer
     let repository
 
     beforeAll( () => {
+<<<<<<< HEAD
         dataTransfer = new DataTransfer(pool)       // use postgres pool, this will provoke  duplicate key failures
         // dataTransfer = new MockDataTransfer()
+=======
+        const pool = new Pool({
+            user: 'grouppurchaseadmin',
+            host: 'localhost',
+            database: 'grouppurchase',
+            password: 'butterfly',
+            port: 5432,
+        })
+        dataTransfer = new MockDataTransfer()
+    })
+    afterAll( () => {
+        if(pool) {
+            pool.end()
+        }
+>>>>>>> 874410704f732f1f31ec5a331e6253075ea6f250
     })
 
     beforeEach(() => {
@@ -38,13 +48,14 @@ describe('UserRepository', function () {
         repository.createUser('Clara', new Date(1998, 10,23), (error, user) => {} )
         repository.createUser('Desmond', new Date(2000, 9, 10), (error, user) => {} )
         repository.createUser('Alice', new Date(1999,4, 17), (error, user) => {} )
-        repository.retrieveUsers((error, users) => {
-            expect(users).toStrictEqual( [
+        repository.retrieveUsers((error, result) => {
+            expect(result).toStrictEqual([
                 { name: 'Alice', birthDate: new Date(1999,4,17), id: 3 },
                 { name: 'Clara', birthDate: new Date(1998,10,23), id: 1},
                 { name: 'Desmond', birthDate: new Date(2000,9,10), id: 2}])
         })
     })
+
     it('return an error when trying to create an existing user', () => {
         repository.createUser('Clara', new Date(1998, 10,23), (error, user) => {})
         repository.createUser('Clara', new Date(2005, 7, 28), (error, user) => {
