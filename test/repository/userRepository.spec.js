@@ -15,7 +15,8 @@ describe('UserRepository', function () {
     let repository
 
     beforeAll( () => {
-        dataTransfer = new MockDataTransfer() // DataTransfer(pool)
+        dataTransfer = new DataTransfer(pool)       // use postgres pool, this will provoke  duplicate key failures
+        // dataTransfer = new MockDataTransfer()
     })
 
     beforeEach(() => {

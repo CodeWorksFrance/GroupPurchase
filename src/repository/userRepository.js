@@ -1,4 +1,8 @@
 UserRepository = class {
+    retrieveUsersP = async () => {
+        const result = await this.dataTransfer.retrieveUsersP()
+        return result
+    }
     constructor(dataTransfer) {
         this.dataTransfer = dataTransfer
     }

@@ -52,15 +52,16 @@ app.get('/foo', (request, response) => {
     const promise = pool.query('SELECT 1;') // calling query without callback => returns a promise
     promise.then(callBack)                  // what to do with query result
 })
-app.get('/users', (request, response) =>
+
+app.get('/users', async (request, response) =>
 {
-    userRepository.retrieveUsers((error, users) => {
-        if(error) {
-            response.status(400).send(error)
-        } else {
-            response.render("users", { users: users })
-        }
-    })
+    try{
+        const users = await userRepository.retrieveUsersP()
+        response.render("users", { users: users })
+    }
+    catch(error) {
+        response.status(400).send(error)
+    }
 })
 
 app.get('/purchase/:id', (request, response) => {
@@ -192,6 +193,4 @@ app.post('/newUser', (request, response) => {
         }
     })
 })
-
-app.get('/users', getUsers)
 
