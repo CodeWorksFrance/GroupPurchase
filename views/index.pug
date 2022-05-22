@@ -40,7 +40,7 @@ body
                        td #{ purchase.user }
                        td #{ (purchase.creationDate).toLocaleDateString("fr") }
                        td
-                        button.btn.btn-primary(onclick="window.location.href='/purchase/"+ purchase.id +"'") Detail
+                        button.btn.btn-outline-dark(onclick="window.location.href='/purchase/"+ purchase.id +"'") Detail
 
     footer.text-muted.py-5
       .container

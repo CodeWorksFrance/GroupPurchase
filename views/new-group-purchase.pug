@@ -1,11 +1,43 @@
 doctype html
-html
-    head
-        title The Group purchase app
-        link(rel='stylesheet' href='https://getbootstrap.com/docs/4.4/dist/css/bootstrap.min.css')
-    body
-           .modal-dialog
-               .modal-content
+head
+  meta(charset='utf-8')
+  meta(name='viewport' content='width=device-width, initial-scale=1')
+  meta(name='description' content='')
+  meta(name='author' content='Michelle AVOMO, Christophe Thibaut')
+  title The Group purchase app
+  link(rel='stylesheet' href='https://getbootstrap.com/docs/4.4/dist/css/bootstrap.min.css')
+body
+    header
+      .navbar.navbar-dark.bg-dark.shadow-sm
+        .container
+          a.navbar-brand.d-flex.align-items-center(href='#')
+            svg.me-2(xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true' viewbox='0 0 24 24')
+              path(d='M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z')
+              circle(cx='12' cy='13' r='4')
+            strong Group purchase
+    main
+    .container.col-xl-10.col-xxl-8.px-4.py-5
+        .col-md-10.mx-auto.col-lg-5
+            form.p-4.p-md-5.border.rounded-3.bg-light(ref="uploadForm" id="uploadForm" role="form" method="POST" action="/upload" enctype="multipart/form-data")
+              .form-floating.mb-3
+                label(for="user") Owner
+                input#name.form-control(type="text", placeholder="user", name="user", required, value="Clara")
+              .form-floating.mb-3
+                label(for="date") Date
+                input#date.form-control(type="date", name="date", required, value="07/05/2022")
+              .form-floating.mb-3
+                 label(for="date") Shipping fee
+                 input#shippingFee.form-control(type="number", min="0", step="0.01", name="shippingFee", required, value="42.17")
+              .form-floating.mb-3
+                 label(for="date") Filename
+                 input#shippingFee.form-control(type="number", min="0", step="0.01", name="shippingFee", required, value="42.17")
+              .d-grid.gap-2.d-sm-flex.justify-content-sm-center
+                  button.btn.btn-primary.btn-lg.px-4.me-sm-3.fw-bold(type='submit', name="filename") Confirm
+                  button.btn.btn-outline-info.btn-lg.px-4.ml-5(type='button', onclick="window.location.href='/'") Cancel
+              hr.my-4
+              small.text-muted By clicking Sign up, you agree to the terms of use.
+        .modal-dialog
+             .modal-content
                  .modal-body
                    form(ref="uploadForm" id="uploadForm" role="form" method="POST" action="/upload" enctype="multipart/form-data")
                      div.form-group
