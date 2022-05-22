@@ -1,36 +1,49 @@
 doctype html
-html
-    head
-        title The Group purchase app
-        link(rel='stylesheet' href='https://getbootstrap.com/docs/4.4/dist/css/bootstrap.min.css')
-    body
-        .modal-dialog
-            .modal-content
-                .modal-body
-                    div.purchase
-                        h3 Group Purchase
-                        p
-                        table.ui.celled.table.center.aligned
-                            tbody
-                                tr
-                                    td
-                                        button.btn.btn-primary(onclick="window.location.href='/new'") New Group Purchase
-                                    td
-                                        button.btn.btn-primary(onclick="window.location.href='/users'") Users
-                        table.ui.celled.table.center.aligned
-                            tbody
-                                tr
-                                    th  Id
-                                    th  User
-                                    th  Date
-                                each purchase in purchases
-                                    tr
-                                        td #{ purchase.id }
-                                        td #{ purchase.user }
-                                        td #{ (purchase.creationDate).toLocaleDateString("fr") }
-                                        td
-                                            button.btn.btn-primary(onclick="window.location.href='/purchase/"+ purchase.id +"'") Detail
+head
+  meta(charset='utf-8')
+  meta(name='viewport' content='width=device-width, initial-scale=1')
+  meta(name='description' content='')
+  meta(name='author' content='Michelle AVOMO, Christophe Thibaut')
+  title The Group purchase app
+  link(rel='stylesheet' href='https://getbootstrap.com/docs/4.4/dist/css/bootstrap.min.css')
+body
+    header
+      .navbar.navbar-dark.bg-dark.shadow-sm
+        .container
+          a.navbar-brand.d-flex.align-items-center(href='#')
+            svg.me-2(xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='none' stroke='currentColor' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' aria-hidden='true' viewbox='0 0 24 24')
+              path(d='M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z')
+              circle(cx='12' cy='13' r='4')
+            strong Group purchase
+    main
+    .px-4.py-5.my-5.text-center
+      h1.display-5.fw-bold Hi! welcome to the Groupped purchase!
+      .col-lg-6.mx-auto
+        p.lead.mb-4
+          | ...
+        .d-grid.gap-2.d-sm-flex.justify-content-sm-center.mb-5
+          button.btn.btn-primary.btn-lg.px-4.me-sm-3(type='button' onclick="window.location.href='/new'") New Group Purchase
+          button.btn.btn-outline-secondary.btn-lg.px-4(type='button' onclick="window.location.href='/users'") See users
+        .container
+          .row.align-items-center.g-lg-5.py-5
+              table.table.table-hover
+                thead
+                    tr
+                      th(scope='col') #Id
+                      th(scope='col') Owner
+                      th(scope='col') Creation date
+                      th(scope='col') Action
+                tbody
+                    tr
+                    each purchase in purchases
+                       td #{ purchase.id }
+                       td #{ purchase.user }
+                       td #{ (purchase.creationDate).toLocaleDateString("fr") }
+                       td
+                        button.btn.btn-primary(onclick="window.location.href='/purchase/"+ purchase.id +"'") Detail
 
-
-
-
+    footer.text-muted.py-5
+      .container
+        p.float-end.mb-1
+          a(href='#') Back to top
+        p.mb-1 Lorem ipsum!
