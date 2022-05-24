@@ -17,7 +17,7 @@ const pool = new Pool({
 })
 const app = express()
 const port = 3000
-const userRepository = new UserRepository(new DataTransfer(pool))
+const userRepository = new UserRepository(pool)
 const purchaseRepository = new PurchaseRepository(pool)
 app.set("view engine", "pug")
 app.use(bodyParser.json())
@@ -25,7 +25,7 @@ app.use(bodyParser.urlencoded({extended: true}))
 // enable files upload
 app.use(fileUpload({createParentPath: true}))
 
-app.get('/', async (request, response) => {
+app.get('/', async (_, response) => {
     try {
         const data = await purchaseRepository.findLatestPurchases()
         const purchases = []
@@ -43,14 +43,18 @@ app.get('/', async (request, response) => {
     }
 })
 
-app.get('/users', (request, response) => {
-    userRepository.retrieveUsers((error, users) => {
-        if (error) {
-            response.status(400).send(error)
-        } else {
-            response.render("users", {users: users})
+app.get('/users', async (_, response) => {
+    try {
+        const rawUsers = await userRepository.retrieveUsers()
+        const users = []
+        for (let i = 0; i < rawUsers.length; i++) {
+            const user = {name: rawUsers[i].name, birthDate: rawUsers[i].birth_date}
+            users.push(user)
         }
-    })
+        response.render("users", {users: users})
+    } catch (error) {
+        response.status(500).send(error)
+    }
 })
 
 app.get('/purchase/:id', (request, response) => {
