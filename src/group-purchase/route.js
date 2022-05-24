@@ -57,50 +57,44 @@ app.get('/users', async (_, response) => {
     }
 })
 
-app.get('/purchase/:id', (request, response) => {
+app.get('/purchase/:id', async (request, response) => {
     const id = parseInt(request.params.id)
-    pool.query('SELECT p.id, u.name, p.creation_date, shipping_fee FROM Purchases p INNER JOIN Users u ON u.id = p.user_id WHERE p.id = $1', [id], (error, result) => {
-        if (error || result.rows.length === 0) {
-            response.status(400).send(error)
-        } else {
-            const row = result.rows[0]
-            const purchase = {
-                id: row.id,
-                user: row.name,
-                creationDate: row.creation_date,
-                shippingFee: row.shipping_fee,
-                items: [],
-            }
-            pool.query('SELECT i.label, i.quantity, i.unit_price, u.name FROM Purchase_Items i INNER JOIN Users u ON u.id = i.buyer_id WHERE i.purchase_id = $1', [id], (error, result) => {
-                if (error) {
-                    response.status(400).send(error)
-                } else {
-                    result.rows.forEach(row => {
-                        const item = {
-                            label: row.label,
-                            quantity: row.quantity,
-                            unitPrice: row.unit_price,
-                            amount: row.quantity * row.unit_price,
-                            buyer: row.name,
-                        }
-                        purchase.items.push(item)
-                    })
-                    response.render("purchase", {
-                        purchase: purchase,
-                        getTotal: (items) => {
-                            let result = 0;
-                            items.forEach(item => {
-                                result += item.amount
-                            })
-                            return result
-                        },
-                        bills: computeBills(purchase),
-                        showRunningTotal: true
-                    })
-                }
-            })
+    try{
+        const selectedPurchase = await purchaseRepository.findPurchaseItem(id)
+        const row =selectedPurchase[0]
+        const purchase = {
+            id: row.id,
+            user: row.name,
+            creationDate: row.creation_date,
+            shippingFee: row.shipping_fee,
+            items: [],
         }
-    })
+        const orderedStuff = await purchaseRepository.findOrdersByUsers(id)
+        orderedStuff.forEach(row => {
+            const item = {
+                label: row.label,
+                quantity: row.quantity,
+                unitPrice: row.unit_price,
+                amount: row.quantity * row.unit_price,
+                buyer: row.name,
+            }
+            purchase.items.push(item)
+        })
+        response.render("purchase", {
+            purchase: purchase,
+            getTotal: (items) => {
+                let result = 0;
+                items.forEach(item => {
+                    result += item.amount
+                })
+                return result
+            },
+            bills: computeBills(purchase),
+            showRunningTotal: true
+        })
+    }catch (error) {
+        response.status(400).send(error)
+    }
 })
 
 app.get('/new', (request, response) => {
