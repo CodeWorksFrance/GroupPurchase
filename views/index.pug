@@ -34,8 +34,8 @@ body
                       th(scope='col') Creation date
                       th(scope='col') Action
                 tbody
+                   each purchase in purchases
                     tr
-                    each purchase in purchases
                        td #{ purchase.id }
                        td #{ purchase.user }
                        td #{ (purchase.creationDate).toLocaleDateString("fr") }
@@ -44,6 +44,5 @@ body
 
     footer.text-muted.py-5
       .container
-        p.float-end.mb-1
+        p.float-start.mb-1
           a(href='#') Back to top
-        p.mb-1 Lorem ipsum!
