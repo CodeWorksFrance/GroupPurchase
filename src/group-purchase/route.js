@@ -25,26 +25,22 @@ app.use(bodyParser.urlencoded({extended: true}))
 // enable files upload
 app.use(fileUpload({createParentPath: true}))
 
-app.get('/', (request, response) => {
-    purchaseRepository.findLatestPurchases()
-        .then((data) => {
-            console.log("About to display the data :::: ", data);
-            const purchases = []
-            for (let i = 0; i < data.length; i++) {
-                const purchase = {
-                    id: data[i].id,
-                    user: data[i].name,
-                    creationDate: data[i].creation_date
-                }
-                purchases.push(purchase)
+app.get('/', async (request, response) => {
+    try {
+        const data = await purchaseRepository.findLatestPurchases()
+        const purchases = []
+        for (let i = 0; i < data.length; i++) {
+            const purchase = {
+                id: data[i].id,
+                user: data[i].name,
+                creationDate: data[i].creation_date
             }
-            console.log("All the purchase::: ", purchases);
-            response.render("index", {purchases: purchases});
-        })
-        .catch(error => {
-            console.log("::: Error ::: ", error)
-            response.status(400).send(error);
-        });
+            purchases.push(purchase)
+        }
+        response.render("index", {purchases: purchases});
+    } catch (error) {
+        response.status(500).send(error);
+    }
 })
 
 app.get('/users', (request, response) => {
