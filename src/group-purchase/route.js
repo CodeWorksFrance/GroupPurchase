@@ -7,6 +7,7 @@ const computeBills = require('../../src/domain/computeBills')
 const importItems = require("../domain/importItems");
 const UserRepository = require("../repository/userRepository")
 const DataTransfer = require("../repository/dataTransfer")
+const PurchaseRepository = require("../repository/purchaseRepository");
 const pool = new Pool({
     user: 'grouppurchaseadmin',
     host: 'localhost',
@@ -17,46 +18,48 @@ const pool = new Pool({
 const app = express()
 const port = 3000
 const userRepository = new UserRepository(new DataTransfer(pool))
-
+const purchaseRepository = new PurchaseRepository(pool)
 app.set("view engine", "pug")
 app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({extended: true}))
 // enable files upload
-app.use(fileUpload({ createParentPath: true }))
+app.use(fileUpload({createParentPath: true}))
 
 app.get('/', (request, response) => {
-    pool.query('SELECT p.Id, u.Name, creation_date FROM Purchases p INNER JOIN Users u ON u.id = p.user_id ORDER BY creation_date DESC', (error,result) => {
-        if (error) {
-            response.status(400).send(error)
-        } else {
+    purchaseRepository.findLatestPurchases()
+        .then((data) => {
+            console.log("About to display the data :::: ", data);
             const purchases = []
-            for (let i = 0; i < result.rows.length; i++) {
+            for (let i = 0; i < data.length; i++) {
                 const purchase = {
-                    id: result.rows[i].id,
-                    user: result.rows[i].name,
-                    creationDate: result.rows[i].creation_date
+                    id: data[i].id,
+                    user: data[i].name,
+                    creationDate: data[i].creation_date
                 }
                 purchases.push(purchase)
             }
-            response.render("index", {purchases: purchases})
-        }
-    })
+            console.log("All the purchase::: ", purchases);
+            response.render("index", {purchases: purchases});
+        })
+        .catch(error => {
+            console.log("::: Error ::: ", error)
+            response.status(400).send(error);
+        });
 })
 
-app.get('/users', (request, response) =>
-{
+app.get('/users', (request, response) => {
     userRepository.retrieveUsers((error, users) => {
-        if(error) {
+        if (error) {
             response.status(400).send(error)
         } else {
-            response.render("users", { users: users })
+            response.render("users", {users: users})
         }
     })
 })
 
 app.get('/purchase/:id', (request, response) => {
     const id = parseInt(request.params.id)
-    pool.query('SELECT p.id, u.name, creation_date, shipping_fee FROM Purchases p INNER JOIN Users u ON u.id = p.user_id WHERE p.id = $1', [id], (error, result) => {
+    pool.query('SELECT p.id, u.name, p.creation_date, shipping_fee FROM Purchases p INNER JOIN Users u ON u.id = p.user_id WHERE p.id = $1', [id], (error, result) => {
         if (error || result.rows.length === 0) {
             response.status(400).send(error)
         } else {
@@ -92,7 +95,8 @@ app.get('/purchase/:id', (request, response) => {
                             return result
                         },
                         bills: computeBills(purchase),
-                        showRunningTotal: true })
+                        showRunningTotal: true
+                    })
                 }
             })
         }
@@ -134,9 +138,9 @@ app.listen(port, () => {
 })
 
 const createUser = (request, response) => {
-    const { name, birthDate } = request.body
+    const {name, birthDate} = request.body
     userRepository.createUser(name, birthDate, (error, user) => {
-        if(error) {
+        if (error) {
             response.status(400).send(error)
         } else {
             response.status(201).send(`User added with ID: ${user.id}`)
