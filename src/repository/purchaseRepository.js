@@ -5,8 +5,8 @@ class PurchaseRepository{
     }
 
      findLatestPurchases(){
-        const purchaseQuery = 'SELECT p.Id, u.Name, p.creation_date FROM Purchases p INNER JOIN Users u ON u.id = p.user_id ORDER BY p.creation_date DESC'
-      return this.pool.query(purchaseQuery)
+        const selectQuery = 'SELECT p.Id, u.Name, p.creation_date FROM Purchases p INNER JOIN Users u ON u.id = p.user_id ORDER BY p.creation_date DESC'
+      return this.pool.query(selectQuery)
             .then(response => response.rows)
             .catch(error =>  {
                 console.log("An error has occured:::", error)
@@ -15,8 +15,8 @@ class PurchaseRepository{
     }
 
     findPurchaseItem(id){
-        const query = `SELECT p.id, u.name, p.creation_date, p.shipping_fee FROM Purchases p INNER JOIN Users u ON u.id = p.user_id WHERE p.id = ${id}` ;
-        return this.pool.query(query)
+        const selectQuery = `SELECT p.id, u.name, p.creation_date, p.shipping_fee FROM Purchases p INNER JOIN Users u ON u.id = p.user_id WHERE p.id = ${id}` ;
+        return this.pool.query(selectQuery)
             .then(response => response.rows)
             .catch(error => {
                 console.log("An error has occured:::", error)
@@ -32,6 +32,10 @@ class PurchaseRepository{
                 console.log("An error has occured:::", error)
                 throw error
             })
+    }
+
+    createPurchaseEntry(){
+       // const insertQuery = 'INSERT INTO PURCHASES (User_Id, Creation_Date, Shipping_Fee) SELECT u.Id, $2, $3 FROM Users as u WHERE u.name = $1 RETURNING ID;
     }
 }
 
