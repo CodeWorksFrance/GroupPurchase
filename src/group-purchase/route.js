@@ -6,7 +6,6 @@ const Pool = require('pg').Pool
 const computeBills = require('../../src/domain/computeBills')
 const importItems = require("../domain/importItems");
 const UserRepository = require("../repository/userRepository")
-const DataTransfer = require("../repository/dataTransfer")
 const PurchaseRepository = require("../repository/purchaseRepository");
 const pool = new Pool({
     user: 'grouppurchaseadmin',
@@ -142,9 +141,6 @@ const createUser = (request, response) => {
     })
 }
 
-const getUsers = (request, response) => {
-}
-
 const createPurchase = (purchase, response) => {
     var purchaseId;
     pool.query('INSERT INTO PURCHASES (User_Id, Creation_Date, Shipping_Fee) SELECT u.Id, $2, $3 FROM Users as u WHERE u.name = $1 RETURNING ID;',
@@ -181,6 +177,3 @@ app.post('/newUser', (request, response) => {
         }
     })
 })
-
-app.get('/users', getUsers)
-
