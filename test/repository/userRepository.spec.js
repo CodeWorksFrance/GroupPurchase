@@ -9,10 +9,6 @@ describe('UserRepository', function () {
     let repository
 
     beforeAll( () => {
-<<<<<<< HEAD
-        dataTransfer = new DataTransfer(pool)       // use postgres pool, this will provoke  duplicate key failures
-        // dataTransfer = new MockDataTransfer()
-=======
         const pool = new Pool({
             user: 'grouppurchaseadmin',
             host: 'localhost',
@@ -26,7 +22,6 @@ describe('UserRepository', function () {
         if(pool) {
             pool.end()
         }
->>>>>>> 874410704f732f1f31ec5a331e6253075ea6f250
     })
 
     beforeEach(() => {
