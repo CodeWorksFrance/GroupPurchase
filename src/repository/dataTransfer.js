@@ -2,18 +2,15 @@ DataTransfer = class {
    constructor(pool) {
        this.pool = pool
    }
-    retrieveUsersP = () => {
-        this.pool.query('SELECT * FROM Users ORDER BY Name ASC')
-        .then((result) => {
-                const users = []
-                for (let i = 0; i < result.rows.length; i++) {
-                    const user = {name: result.rows[i].name, birthDate: result.rows[i].birth_date}
-                    users.push(user)
-                }
-                return users;
-            }, (error) => {
-                throw new Error(error)
-            })
+    retrieveUsersP = async () => {
+        const result = await this.pool.query('SELECT * FROM Users ORDER BY Name ASC');
+        // everything from here is the promise.then() part
+        const users = []
+        for (let i = 0; i < result.rows.length; i++) {
+            const user = {name: result.rows[i].name, birthDate: result.rows[i].birth_date}
+            users.push(user)
+        }
+        return users; // this return is *NOT* the return of the retrieveUsersP
     }
 
    retrieveUsers = (callBack) => {
