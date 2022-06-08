@@ -7,7 +7,7 @@ const computeBills = require('../../src/domain/computeBills')
 const importItems = require("../domain/importItems");
 const createUser = require("../domain/createUser")
 const UserRepository = require("../repository/userRepository")
-const PurchaseRepository = require("../repository/purchaseRepository");
+const DataRepository = require("../repository/dataRepository");
 const pool = new Pool({
     user: 'grouppurchaseadmin',
     host: 'localhost',
@@ -18,7 +18,7 @@ const pool = new Pool({
 const app = express()
 const port = 3000
 const userRepository = new UserRepository(pool)
-const purchaseRepository = new PurchaseRepository(pool)
+const dataRepository = new DataRepository(pool)
 app.set("view engine", "pug")
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
@@ -26,7 +26,7 @@ app.use(fileUpload({createParentPath: true}))
 
 app.get('/', async (_, response) => {
     try {
-        const data = await purchaseRepository.findLatestPurchases()
+        const data = await dataRepository.findLatestPurchases()
         const purchases = []
         for (let i = 0; i < data.length; i++) {
             const purchase = {
@@ -59,7 +59,7 @@ app.get('/users', async (_, response) => {
 app.get('/purchase/:id', async (request, response) => {
     const id = parseInt(request.params.id)
     try{
-        const selectedPurchase = await purchaseRepository.findPurchaseItem(id)
+        const selectedPurchase = await dataRepository.findPurchaseItem(id)
         const row =selectedPurchase[0]
         const purchase = {
             id: row.id,
@@ -68,7 +68,7 @@ app.get('/purchase/:id', async (request, response) => {
             shippingFee: row.shipping_fee,
             items: [],
         }
-        const orderedStuff = await purchaseRepository.findOrdersByUsers(id)
+        const orderedStuff = await dataRepository.findOrdersByUsers(id)
         orderedStuff.forEach(row => {
             const item = {
                 label: row.label,
