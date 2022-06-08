@@ -18,8 +18,6 @@ const dbConnection = new Pool({
 
 const PurchaseRepository = require('./group-purchase/purchase-repository');
 const purchaseService = new PurchaseRepository(dbConnection);
-
-
 const app = express()
 const port = 3000
 app.set("view engine", "pug")
@@ -37,7 +35,7 @@ app.get('/', async (_, response) => {
 })
 
 /********************** Purchase **************************/
-app.post('/upload',  (request, response) => {
+app.post('/upload', (request, response) => {
     let purchaseFile;
     let uploadPath;
     if (!request.files || Object.keys(request.files).length === 0) {
@@ -50,14 +48,8 @@ app.post('/upload',  (request, response) => {
                 return response.status(500).send(err)
             } else {
                 const items = fileService.importItems(purchaseFile.data);
-                const purchase = {
-                    user: request.body.user,
-                    purchaseDate: request.body.date,
-                    shippingFee: Number.parseFloat(request.body.shippingFee),
-                    items: items,
-                }
                 try {
-                    const purchaseId = await databaseService.createPurchase(purchase);
+                    const purchaseId = await purchaseService.createPurchase(request.body, items);
                     response.redirect(`/purchase/${purchaseId}`);
                 } catch (error) {
                     response.status(400).send(error);
@@ -69,7 +61,7 @@ app.post('/upload',  (request, response) => {
 
 app.get('/purchase/:id', async (request, response) => {
     const id = parseInt(request.params.id)
-    try{
+    try {
         const purchaseDetails = await purchaseService.findPurchaseItem(id);
         response.render("purchase", {
             purchase: purchaseDetails,
@@ -83,7 +75,7 @@ app.get('/purchase/:id', async (request, response) => {
             bills: calculate(purchaseDetails),
             showRunningTotal: true
         })
-    }catch (error) {
+    } catch (error) {
         console.log(":::: An error has occured:::: ", error);
         response.status(400).send(error)
     }
@@ -110,10 +102,10 @@ app.get('/users', async (_, response) => {
 
 app.post('/newUser', async (request, response) => {
     const {user, date} = request.body
-    try{
+    try {
         const result = await databaseService.createUser(request.body)
-       response.redirect('/users')
-    }catch (error){
+        response.redirect('/users')
+    } catch (error) {
         console.error(error)
         response.status(400).send(error)
     }

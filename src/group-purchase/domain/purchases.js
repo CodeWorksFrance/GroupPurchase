@@ -12,17 +12,17 @@ class Purchases {
         return purchases;
     }
 
-    mapToPurchase(selectedItem){
-      return {
+    mapToPurchase(selectedItem, purchasedItems = []) {
+        return {
             id: selectedItem.id,
             user: selectedItem.name,
             creationDate: selectedItem.creation_date,
             shippingFee: selectedItem.shipping_fee,
-            items: [],
+            items: purchasedItems,
         }
     }
 
-    addDetail(allPurchases, newPurchase) {
+    createPurchaseDetail(allPurchases, newPurchase) {
         const purchaseDetail = {
             label: newPurchase.label,
             quantity: newPurchase.quantity,
@@ -32,6 +32,15 @@ class Purchases {
         }
         allPurchases.push(purchaseDetail);
 
+    }
+
+    newPurchase(payload, purchaseDetails) {
+        return {
+            user: payload.user,
+            purchaseDate: payload.date,
+            shippingFee: Number.parseFloat(payload.shippingFee),
+            items: purchaseDetails,
+        }
     }
 }
 

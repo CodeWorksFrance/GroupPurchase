@@ -68,7 +68,7 @@ class DbService {
 
     }
 
-    createPurchase(purchase){
+  /*  createPurchase(purchase){
         const createNewPurchaseQuery = 'INSERT INTO PURCHASES (User_Id, Creation_Date, Shipping_Fee) SELECT u.Id, $2, $3 FROM Users as u WHERE u.name = $1 RETURNING ID;'
             let lastPurchaseId = this.pool.query(createNewPurchaseQuery, [purchase.user, purchase.purchaseDate, purchase.shippingFee])
             .then(result => {
@@ -90,7 +90,7 @@ class DbService {
                 throw error
             });
         return lastPurchaseId;
-    }
+    }*/
 }
 
 module.exports = DbService;
