@@ -1,23 +1,14 @@
 const express = require('express')
 const fileUpload = require('express-fileupload')
 const bodyParser = require('body-parser')
-const Pool = require('pg').Pool
 const calculate = require('../service/Calculator')
 const DbService = require("../service/dbService");
 const FileService = require("../service/fileService")
-const pool = new Pool({
-    user: 'grouppurchaseadmin',
-    host: 'localhost',
-    database: 'grouppurchase',
-    password: 'butterfly',
-    port: 5432,
-})
-const app = express()
-const port = 3000
-
-const databaseService = new DbService(pool);
+const databaseService = new DbService();
 const fileService = new FileService();
 
+const app = express()
+const port = 3000
 app.set("view engine", "pug")
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
@@ -42,7 +33,6 @@ app.get('/', async (_, response) => {
 })
 
 /********************** Purchase **************************/
-
 app.post('/upload',  (request, response) => {
     let purchaseFile;
     let uploadPath;
@@ -51,7 +41,7 @@ app.post('/upload',  (request, response) => {
     } else {
         const purchaseFile = request.files.purchaseFile
         const uploadPath = './uploads/' + purchaseFile.name
-        purchaseFile.mv(uploadPath, async function (err) {
+        purchaseFile.mv(uploadPath, async (err) => {
             if (err) {
                 return response.status(500).send(err)
             } else {
@@ -142,7 +132,6 @@ app.post('/newUser', async (request, response) => {
         response.status(400).send(error)
     }
 });
-
 
 /********************** run app **************************/
 app.listen(port, () => {

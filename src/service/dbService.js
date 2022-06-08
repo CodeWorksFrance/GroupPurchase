@@ -1,7 +1,14 @@
-class DbService {
+const Pool = require('pg').Pool
 
-    constructor(pool) {
-        this.pool = pool
+class DbService {
+    constructor() {
+        this.pool = new Pool({
+            user: 'grouppurchaseadmin',
+            host: 'localhost',
+            database: 'grouppurchase',
+            password: 'butterfly',
+            port: 5432,
+        })
     }
 
     findLatestPurchases() {
