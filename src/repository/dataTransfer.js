@@ -1,4 +1,4 @@
-DataTransfer = class {
+class DataTransfer {
    constructor(pool) {
        this.pool = pool
    }

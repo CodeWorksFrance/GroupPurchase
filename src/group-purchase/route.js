@@ -5,6 +5,7 @@ const csvParse = require('csv-parse')
 const Pool = require('pg').Pool
 const computeBills = require('../../src/domain/computeBills')
 const importItems = require("../domain/importItems");
+const createUser = require("../domain/createUser")
 const UserRepository = require("../repository/userRepository")
 const PurchaseRepository = require("../repository/purchaseRepository");
 const pool = new Pool({
@@ -21,7 +22,6 @@ const purchaseRepository = new PurchaseRepository(pool)
 app.set("view engine", "pug")
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
-// enable files upload
 app.use(fileUpload({createParentPath: true}))
 
 app.get('/', async (_, response) => {
@@ -129,17 +129,6 @@ app.post('/upload', (request, response) => {
 app.listen(port, () => {
     console.log(`App running on port ${port}.`)
 })
-
-const createUser = (request, response) => {
-    const {name, birthDate} = request.body
-    userRepository.createUser(name, birthDate, (error, user) => {
-        if (error) {
-            response.status(400).send(error)
-        } else {
-            response.status(201).send(`User added with ID: ${user.id}`)
-        }
-    })
-}
 
 const createPurchase = (purchase, response) => {
     var purchaseId;

@@ -3,7 +3,7 @@ const MockDataTransfer = require("./mockDataTransfer");
 const Pool = require('pg').Pool
 const DataTransfer = require("../../src/repository/dataTransfer")
 
-describe('UserRepository', function () {
+describe('UserRepository',  () => {
     let pool
     let dataTransfer
     let repository
