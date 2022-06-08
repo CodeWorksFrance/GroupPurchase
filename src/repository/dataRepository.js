@@ -1,3 +1,5 @@
+const {response} = require("express");
+
 class DataRepository {
 
     constructor(pool) {
@@ -40,9 +42,39 @@ class DataRepository {
             })
     }
 
-    createPurchaseEntry() {
-        // const insertQuery = 'INSERT INTO PURCHASES (User_Id, Creation_Date, Shipping_Fee) SELECT u.Id, $2, $3 FROM Users as u WHERE u.name = $1 RETURNING ID;
+    retrieveUsers() {
+        const findUsersQuery = 'SELECT * FROM USERS ORDER BY NAME ASC';
+        return this.pool.query(findUsersQuery)
+            .then(response => response.rows)
+            .catch(error =>  {
+                console.log("An error has occured:::", error)
+                throw error
+            })
     }
+
+    createUser(request){
+        console.log("This is the request::: ", request);
+
+        const {name, birthDate} = request.body
+        this.pool.query('INSERT INTO USERS (name, birth_date) VALUES ($1, $2)', [name, birthDate])
+            .then(response => response)
+            .catch(error => {
+                console.log("An error has occured:::", error)
+                throw error
+            });
+
+    }
+
+    /*createUsers(name, birthDate){
+       return this.pool.query('INSERT INTO USERS (name, birth_date) VALUES ($1, $2) RETURNING Id;', [name, birthDate], (error, result) => {
+            if(error) {
+                callBack(error, null)
+            } else {
+                const user = { name: name, birthDate: birthDate, id: result.rows[0].id }
+                callBack(null, user)
+            }
+        })
+    }*/
 }
 
 module.exports = DataRepository;

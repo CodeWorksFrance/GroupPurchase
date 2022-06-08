@@ -6,7 +6,6 @@ const Pool = require('pg').Pool
 const computeBills = require('../../src/domain/computeBills')
 const importItems = require("../domain/importItems");
 const createUser = require("../domain/createUser")
-const UserRepository = require("../repository/userRepository")
 const DataRepository = require("../repository/dataRepository");
 const pool = new Pool({
     user: 'grouppurchaseadmin',
@@ -17,7 +16,6 @@ const pool = new Pool({
 })
 const app = express()
 const port = 3000
-const userRepository = new UserRepository(pool)
 const dataRepository = new DataRepository(pool)
 app.set("view engine", "pug")
 app.use(bodyParser.json())
@@ -44,7 +42,7 @@ app.get('/', async (_, response) => {
 
 app.get('/users', async (_, response) => {
     try {
-        const rawUsers = await userRepository.retrieveUsers()
+        const rawUsers = await dataRepository.retrieveUsers()
         const users = []
         for (let i = 0; i < rawUsers.length; i++) {
             const user = {name: rawUsers[i].name, birthDate: rawUsers[i].birth_date}
@@ -96,7 +94,7 @@ app.get('/purchase/:id', async (request, response) => {
     }
 })
 
-app.get('/new', (request, response) => {
+app.get('/new', (_, response) => {
     response.render("new-group-purchase")
 })
 
@@ -120,7 +118,6 @@ app.post('/upload', (request, response) => {
                     items: items,
                 }
                 createPurchase(purchase, response)
-                //console.log("%j", purchase)
             }
         })
     }
@@ -132,8 +129,6 @@ app.listen(port, () => {
 
 const createPurchase = (purchase, response) => {
     var purchaseId;
-  //  console.log("createPurchase:\n%j\n", purchase)
-   // console.log([purchase.user, purchase.purchaseDate, purchase.shippingFee])
     pool.query('INSERT INTO PURCHASES (User_Id, Creation_Date, Shipping_Fee) SELECT u.Id, $2, $3 FROM Users as u WHERE u.name = $1 RETURNING ID;',
         [purchase.user, purchase.purchaseDate, purchase.shippingFee], (error, result) => {
             if (error) {
