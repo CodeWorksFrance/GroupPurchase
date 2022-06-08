@@ -1,11 +1,8 @@
 const express = require('express')
 const fileUpload = require('express-fileupload')
 const bodyParser = require('body-parser')
-const calculate = require('./service/Calculator')
-const DbService = require("./service/dbService");
 const FileService = require("./service/fileService")
 const {Pool} = require("pg");
-const databaseService = new DbService();
 const fileService = new FileService();
 
 const dbConnection = new Pool({
@@ -16,8 +13,12 @@ const dbConnection = new Pool({
     port: 5432,
 });
 
-const PurchaseRepository = require('./group-purchase/purchase-repository');
+const PurchaseRepository = require('./purchase/purchase-repository');
+const UserRepository = require('./user/user-repository');
+
 const purchaseService = new PurchaseRepository(dbConnection);
+const userService = new UserRepository(dbConnection);
+
 const app = express()
 const port = 3000
 app.set("view engine", "pug")
@@ -63,18 +64,7 @@ app.get('/purchase/:id', async (request, response) => {
     const id = parseInt(request.params.id)
     try {
         const purchaseDetails = await purchaseService.findPurchaseItem(id);
-        response.render("purchase", {
-            purchase: purchaseDetails,
-            getTotal: (items) => {
-                let result = 0;
-                items.forEach(item => {
-                    result += item.amount
-                })
-                return result
-            },
-            bills: calculate(purchaseDetails),
-            showRunningTotal: true
-        })
+        response.render("purchase", purchaseService.createPurchaseToRender(purchaseDetails));
     } catch (error) {
         console.log(":::: An error has occured:::: ", error);
         response.status(400).send(error)
@@ -88,12 +78,7 @@ app.get('/new', (_, response) => {
 /********************** Users **************************/
 app.get('/users', async (_, response) => {
     try {
-        const rawUsers = await databaseService.retrieveUsers()
-        const users = []
-        for (let i = 0; i < rawUsers.length; i++) {
-            const user = {name: rawUsers[i].name, birthDate: rawUsers[i].birth_date}
-            users.push(user)
-        }
+        const users = await userService.retrieveUsers()
         response.render("users", {users: users})
     } catch (error) {
         response.status(500).send(error)
@@ -101,9 +86,8 @@ app.get('/users', async (_, response) => {
 });
 
 app.post('/newUser', async (request, response) => {
-    const {user, date} = request.body
     try {
-        const result = await databaseService.createUser(request.body)
+        const result = await userService.createUser(request.body)
         response.redirect('/users')
     } catch (error) {
         console.error(error)
