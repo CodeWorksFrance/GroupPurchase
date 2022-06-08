@@ -3,8 +3,8 @@ const fileUpload = require('express-fileupload')
 const bodyParser = require('body-parser')
 const Pool = require('pg').Pool
 const computeBills = require('../service/computeBills')
-const importItems = require("../service/importItems");
-const DataRepository = require("../repository/dataRepository");
+const DbService = require("../service/dbService");
+const FileService = require("../service/fileService")
 const pool = new Pool({
     user: 'grouppurchaseadmin',
     host: 'localhost',
@@ -14,7 +14,9 @@ const pool = new Pool({
 })
 const app = express()
 const port = 3000
-const dataRepository = new DataRepository(pool)
+const databaseService = new DbService(pool);
+const fileService = new FileService();
+
 app.set("view engine", "pug")
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
@@ -22,7 +24,7 @@ app.use(fileUpload({createParentPath: true}))
 
 app.get('/', async (_, response) => {
     try {
-        const data = await dataRepository.findLatestPurchases()
+        const data = await databaseService.findLatestPurchases()
         const purchases = []
         for (let i = 0; i < data.length; i++) {
             const purchase = {
@@ -40,7 +42,7 @@ app.get('/', async (_, response) => {
 
 /********************** Purchase **************************/
 
-app.post('/upload', (request, response) => {
+app.post('/upload',  (request, response) => {
     let purchaseFile;
     let uploadPath;
     if (!request.files || Object.keys(request.files).length === 0) {
@@ -48,18 +50,23 @@ app.post('/upload', (request, response) => {
     } else {
         const purchaseFile = request.files.purchaseFile
         const uploadPath = './uploads/' + purchaseFile.name
-        purchaseFile.mv(uploadPath, function (err) {
+        purchaseFile.mv(uploadPath, async function (err) {
             if (err) {
                 return response.status(500).send(err)
             } else {
-                const items = importItems(purchaseFile.data);
+                const items = fileService.importItems(purchaseFile.data);
                 const purchase = {
                     user: request.body.user,
                     purchaseDate: request.body.date,
                     shippingFee: Number.parseFloat(request.body.shippingFee),
                     items: items,
                 }
-                createPurchase(purchase, response)
+                try {
+                    const result = await databaseService.createPurchase(purchase);
+                    response.redirect(`/purchase/${purchaseId}`);
+                } catch (error) {
+                    response.status(400).send(error);
+                }
             }
         })
     }
@@ -68,7 +75,7 @@ app.post('/upload', (request, response) => {
 app.get('/purchase/:id', async (request, response) => {
     const id = parseInt(request.params.id)
     try{
-        const selectedPurchase = await dataRepository.findPurchaseItem(id)
+        const selectedPurchase = await databaseService.findPurchaseItem(id)
         const row =selectedPurchase[0]
         const purchase = {
             id: row.id,
@@ -77,7 +84,7 @@ app.get('/purchase/:id', async (request, response) => {
             shippingFee: row.shipping_fee,
             items: [],
         }
-        const orderedStuff = await dataRepository.findOrdersByUsers(id)
+        const orderedStuff = await databaseService.findOrdersByUsers(id)
         orderedStuff.forEach(row => {
             const item = {
                 label: row.label,
@@ -112,7 +119,7 @@ app.get('/new', (_, response) => {
 /********************** Users **************************/
 app.get('/users', async (_, response) => {
     try {
-        const rawUsers = await dataRepository.retrieveUsers()
+        const rawUsers = await databaseService.retrieveUsers()
         const users = []
         for (let i = 0; i < rawUsers.length; i++) {
             const user = {name: rawUsers[i].name, birthDate: rawUsers[i].birth_date}
@@ -127,8 +134,8 @@ app.get('/users', async (_, response) => {
 app.post('/newUser', async (request, response) => {
     const {user, date} = request.body
     try{
-        const result = await dataRepository.createUser(request.body)
-        response.redirect('/users')
+        const result = await databaseService.createUser(request.body)
+       response.redirect('/users')
     }catch (error){
         console.error(error)
         response.status(400).send(error)
@@ -136,34 +143,8 @@ app.post('/newUser', async (request, response) => {
 });
 
 
-/********************** main app **************************/
+/********************** run app **************************/
 app.listen(port, () => {
     console.log(`App running on port ${port}.`)
-})
-
-const createPurchase = (purchase, response) => {
-    var purchaseId;
-    pool.query('INSERT INTO PURCHASES (User_Id, Creation_Date, Shipping_Fee) SELECT u.Id, $2, $3 FROM Users as u WHERE u.name = $1 RETURNING ID;',
-        [purchase.user, purchase.purchaseDate, purchase.shippingFee], (error, result) => {
-            if (error) {
-                //console.log(error)
-                response.status(400).send(error)
-            } else {
-                let purchaseId = result.rows[0].id;
-                //console.log("PURCHASE#:\n%d\n", purchaseId)
-                for (let i = 0; i < purchase.items.length; i++) {
-                  //  console.log([purchaseId, purchase.items[i].label, purchase.items[i].quantity, purchase.items[i].unitPrice, purchase.items[i].buyer])
-                    pool.query('INSERT INTO PURCHASE_ITEMS(Purchase_Id, Label, Quantity, Unit_Price, Buyer_Id) SELECT $1, $2, $3, $4, u.Id FROM Users AS u WHERE u.name = $5;',
-                        [purchaseId, purchase.items[i].label, purchase.items[i].quantity, purchase.items[i].unitPrice, purchase.items[i].buyer], (error, result) => {
-                            if (error) {
-                                //console.log(error)
-                                response.status(400).send(error)
-                                return
-                            }
-                        })
-                }
-                response.redirect(`/purchase/${purchaseId}`);
-            }
-        })
-}
+});
 
