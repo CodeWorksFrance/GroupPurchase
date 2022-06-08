@@ -1,11 +1,9 @@
 const express = require('express')
 const fileUpload = require('express-fileupload')
 const bodyParser = require('body-parser')
-const csvParse = require('csv-parse')
 const Pool = require('pg').Pool
-const computeBills = require('../../src/domain/computeBills')
-const importItems = require("../domain/importItems");
-const createUser = require("../domain/createUser")
+const computeBills = require('../service/computeBills')
+const importItems = require("../service/importItems");
 const DataRepository = require("../repository/dataRepository");
 const pool = new Pool({
     user: 'grouppurchaseadmin',
@@ -40,17 +38,30 @@ app.get('/', async (_, response) => {
     }
 })
 
-app.get('/users', async (_, response) => {
-    try {
-        const rawUsers = await dataRepository.retrieveUsers()
-        const users = []
-        for (let i = 0; i < rawUsers.length; i++) {
-            const user = {name: rawUsers[i].name, birthDate: rawUsers[i].birth_date}
-            users.push(user)
-        }
-        response.render("users", {users: users})
-    } catch (error) {
-        response.status(500).send(error)
+/********************** Purchase **************************/
+
+app.post('/upload', (request, response) => {
+    let purchaseFile;
+    let uploadPath;
+    if (!request.files || Object.keys(request.files).length === 0) {
+        return response.status(400).send('No file uploaded')
+    } else {
+        const purchaseFile = request.files.purchaseFile
+        const uploadPath = './uploads/' + purchaseFile.name
+        purchaseFile.mv(uploadPath, function (err) {
+            if (err) {
+                return response.status(500).send(err)
+            } else {
+                const items = importItems(purchaseFile.data);
+                const purchase = {
+                    user: request.body.user,
+                    purchaseDate: request.body.date,
+                    shippingFee: Number.parseFloat(request.body.shippingFee),
+                    items: items,
+                }
+                createPurchase(purchase, response)
+            }
+        })
     }
 })
 
@@ -98,31 +109,34 @@ app.get('/new', (_, response) => {
     response.render("new-group-purchase")
 })
 
-app.post('/upload', (request, response) => {
-    let purchaseFile;
-    let uploadPath;
-    if (!request.files || Object.keys(request.files).length === 0) {
-        return response.status(400).send('No file uploaded')
-    } else {
-        const purchaseFile = request.files.purchaseFile
-        const uploadPath = './uploads/' + purchaseFile.name
-        purchaseFile.mv(uploadPath, function (err) {
-            if (err) {
-                return response.status(500).send(err)
-            } else {
-                const items = importItems(purchaseFile.data);
-                const purchase = {
-                    user: request.body.user,
-                    purchaseDate: request.body.date,
-                    shippingFee: Number.parseFloat(request.body.shippingFee),
-                    items: items,
-                }
-                createPurchase(purchase, response)
-            }
-        })
+/********************** Users **************************/
+app.get('/users', async (_, response) => {
+    try {
+        const rawUsers = await dataRepository.retrieveUsers()
+        const users = []
+        for (let i = 0; i < rawUsers.length; i++) {
+            const user = {name: rawUsers[i].name, birthDate: rawUsers[i].birth_date}
+            users.push(user)
+        }
+        response.render("users", {users: users})
+    } catch (error) {
+        response.status(500).send(error)
     }
-})
+});
 
+app.post('/newUser', async (request, response) => {
+    const {user, date} = request.body
+    try{
+        const result = await dataRepository.createUser(request.body)
+        response.redirect('/users')
+    }catch (error){
+        console.error(error)
+        response.status(400).send(error)
+    }
+});
+
+
+/********************** main app **************************/
 app.listen(port, () => {
     console.log(`App running on port ${port}.`)
 })
@@ -153,15 +167,3 @@ const createPurchase = (purchase, response) => {
         })
 }
 
-app.post('/users', createUser)
-
-app.post('/newUser', (request, response) => {
-    const {user, date} = request.body
-    pool.query('INSERT INTO USERS (name, birth_date) VALUES ($1, $2)', [user, date], (error, result) => {
-        if (error) {
-            response.status(400).send(error)
-        } else {
-            response.redirect('/users')
-        }
-    })
-})

@@ -1,4 +1,4 @@
-const computeBills = require('../../src/domain/computeBills')
+const computeBills = require('../../src/service/computeBills')
 
 describe('computeBills', () => {
     it('should create one bill for a purchase of one item by one person', () => {

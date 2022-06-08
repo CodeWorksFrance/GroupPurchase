@@ -1,4 +1,4 @@
-const importItems = require('../../src/domain/importItems')
+const importItems = require('../../src/service/importItems')
 
 describe( 'importItems', () =>
 {
