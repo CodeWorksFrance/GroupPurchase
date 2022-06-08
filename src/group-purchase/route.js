@@ -2,7 +2,7 @@ const express = require('express')
 const fileUpload = require('express-fileupload')
 const bodyParser = require('body-parser')
 const Pool = require('pg').Pool
-const computeBills = require('../service/computeBills')
+const computeBills = require('../service/CoreCalculator')
 const DbService = require("../service/dbService");
 const FileService = require("../service/fileService")
 const pool = new Pool({
@@ -62,7 +62,7 @@ app.post('/upload',  (request, response) => {
                     items: items,
                 }
                 try {
-                    const result = await databaseService.createPurchase(purchase);
+                    const purchaseId = await databaseService.createPurchase(purchase);
                     response.redirect(`/purchase/${purchaseId}`);
                 } catch (error) {
                     response.status(400).send(error);

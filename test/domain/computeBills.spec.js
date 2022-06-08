@@ -1,4 +1,4 @@
-const computeBills = require('../../src/service/computeBills')
+const computeBills = require('../../src/service/CoreCalculator')
 
 describe('computeBills', () => {
     it('should create one bill for a purchase of one item by one person', () => {

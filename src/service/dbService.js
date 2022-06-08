@@ -63,20 +63,26 @@ class DbService {
 
     createPurchase(purchase){
         const createNewPurchaseQuery = 'INSERT INTO PURCHASES (User_Id, Creation_Date, Shipping_Fee) SELECT u.Id, $2, $3 FROM Users as u WHERE u.name = $1 RETURNING ID;'
-        return this.pool.query(createNewPurchaseQuery, [purchase.user, purchase.purchaseDate, purchase.shippingFee])
-            .then(response => {
+            let lastPurchaseId = this.pool.query(createNewPurchaseQuery, [purchase.user, purchase.purchaseDate, purchase.shippingFee])
+            .then(result => {
                 let purchaseId = result.rows[0].id;
                 //console.log("PURCHASE#:\n%d\n", purchaseId)
                 for (let i = 0; i < purchase.items.length; i++) {
                     const selectCreatedItem = 'INSERT INTO PURCHASE_ITEMS(Purchase_Id, Label, Quantity, Unit_Price, Buyer_Id) SELECT $1, $2, $3, $4, u.Id FROM Users AS u WHERE u.name = $5;'
-                    this.pool.query(selectCreatedItem, [purchaseId, purchase.items[i].label, purchase.items[i].quantity, purchase.items[i].unitPrice, purchase.items[i].buyer])
-                        .then(response => response)
-                        .catch(error => {throw error;});
+                    return this.pool.query(selectCreatedItem, [purchaseId, purchase.items[i].label, purchase.items[i].quantity, purchase.items[i].unitPrice, purchase.items[i].buyer])
+                        .then( _ => {
+                           return purchaseId;
+                        })
+                        .catch(error => {
+                            console.log("A first error has occured:::: ", error);
+                            throw error;
+                        });
                 }
             }).catch(error => {
                 console.log("An error has occured while creating a new purchase:::", error)
                 throw error
             });
+        return lastPurchaseId;
     }
 }
 
