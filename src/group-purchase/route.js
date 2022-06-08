@@ -2,7 +2,7 @@ const express = require('express')
 const fileUpload = require('express-fileupload')
 const bodyParser = require('body-parser')
 const Pool = require('pg').Pool
-const computeBills = require('../service/CoreCalculator')
+const calculate = require('../service/Calculator')
 const DbService = require("../service/dbService");
 const FileService = require("../service/fileService")
 const pool = new Pool({
@@ -14,6 +14,7 @@ const pool = new Pool({
 })
 const app = express()
 const port = 3000
+
 const databaseService = new DbService(pool);
 const fileService = new FileService();
 
@@ -104,7 +105,7 @@ app.get('/purchase/:id', async (request, response) => {
                 })
                 return result
             },
-            bills: computeBills(purchase),
+            bills: calculate(purchase),
             showRunningTotal: true
         })
     }catch (error) {

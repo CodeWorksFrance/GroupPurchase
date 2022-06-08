@@ -1,4 +1,4 @@
-const coreCalculator = (purchase) => {
+const calculate = (purchase) => {
     const amounts = {}
     let grandTotal = 0
     purchase.items.forEach(item => {
@@ -24,4 +24,4 @@ const coreCalculator = (purchase) => {
     return bills
 }
 
-module.exports = coreCalculator
+module.exports = calculate
