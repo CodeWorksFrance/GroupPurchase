@@ -1,11 +1,24 @@
 const express = require('express')
 const fileUpload = require('express-fileupload')
 const bodyParser = require('body-parser')
-const calculate = require('../service/Calculator')
-const DbService = require("../service/dbService");
-const FileService = require("../service/fileService")
+const calculate = require('./service/Calculator')
+const DbService = require("./service/dbService");
+const FileService = require("./service/fileService")
+const {Pool} = require("pg");
 const databaseService = new DbService();
 const fileService = new FileService();
+
+const dbConnection = new Pool({
+    user: 'grouppurchaseadmin',
+    host: 'localhost',
+    database: 'grouppurchase',
+    password: 'butterfly',
+    port: 5432,
+});
+
+const PurchaseRepository = require('./group-purchase/purchase-repository');
+const purchaseService = new PurchaseRepository(dbConnection);
+
 
 const app = express()
 const port = 3000
@@ -16,17 +29,8 @@ app.use(fileUpload({createParentPath: true}))
 
 app.get('/', async (_, response) => {
     try {
-        const data = await databaseService.findLatestPurchases()
-        const purchases = []
-        for (let i = 0; i < data.length; i++) {
-            const purchase = {
-                id: data[i].id,
-                user: data[i].name,
-                creationDate: data[i].creation_date
-            }
-            purchases.push(purchase)
-        }
-        response.render("index", {purchases: purchases});
+        const latestPurchases = await purchaseService.findLatestPurchases();
+        response.render("index", {purchases: latestPurchases});
     } catch (error) {
         response.status(500).send(error);
     }
@@ -66,28 +70,9 @@ app.post('/upload',  (request, response) => {
 app.get('/purchase/:id', async (request, response) => {
     const id = parseInt(request.params.id)
     try{
-        const selectedPurchase = await databaseService.findPurchaseItem(id)
-        const row =selectedPurchase[0]
-        const purchase = {
-            id: row.id,
-            user: row.name,
-            creationDate: row.creation_date,
-            shippingFee: row.shipping_fee,
-            items: [],
-        }
-        const orderedStuff = await databaseService.findOrdersByUsers(id)
-        orderedStuff.forEach(row => {
-            const item = {
-                label: row.label,
-                quantity: row.quantity,
-                unitPrice: row.unit_price,
-                amount: row.quantity * row.unit_price,
-                buyer: row.name,
-            }
-            purchase.items.push(item)
-        })
+        const purchaseDetails = await purchaseService.findPurchaseItem(id);
         response.render("purchase", {
-            purchase: purchase,
+            purchase: purchaseDetails,
             getTotal: (items) => {
                 let result = 0;
                 items.forEach(item => {
@@ -95,10 +80,11 @@ app.get('/purchase/:id', async (request, response) => {
                 })
                 return result
             },
-            bills: calculate(purchase),
+            bills: calculate(purchaseDetails),
             showRunningTotal: true
         })
     }catch (error) {
+        console.log(":::: An error has occured:::: ", error);
         response.status(400).send(error)
     }
 })
