@@ -17,7 +17,7 @@ userRouter.get('/users', async (_, response) => {
 
 userRouter.post('/newUser', async (request, response) => {
     try {
-        const result = await userService.createUser(request.body)
+        await userService.createUser(request.body)
         response.redirect('/users')
     } catch (error) {
         console.error(error)
