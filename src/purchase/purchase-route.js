@@ -8,7 +8,6 @@ const purchaseService = new PurchaseRepository(dbConnection);
 const purchaseRouter = express.Router();
 
 purchaseRouter.use(function timeLog(req, res, next) {
-    console.debug('Time: ', Date.now());
     next();
 });
 
@@ -32,7 +31,6 @@ purchaseRouter.get('/purchase/:id', async (request, response) => {
         const purchaseDetails = await purchaseService.findPurchaseItem(id);
         response.render("purchase", purchaseService.createPurchaseToRender(purchaseDetails));
     } catch (error) {
-        console.log(":::: An error has occured:::: ", error);
         response.status(400).send(error)
     }
 });

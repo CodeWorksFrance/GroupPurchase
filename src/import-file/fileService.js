@@ -1,7 +1,6 @@
 const csvParse = require('csv-parse')
 
 class FileService {
-
     importItems(csvData) {
         const parser = csvParse.parse({delimiter: ',', columns: true, trim: true})
         const items = []
