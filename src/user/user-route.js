@@ -1,16 +1,10 @@
 const express = require('express');
-const {Pool} = require("pg");
-const userRouter = express.Router();
-const dbConnection = new Pool({
-    user: 'grouppurchaseadmin',
-    host: 'localhost',
-    database: 'grouppurchase',
-    password: 'butterfly',
-    port: 5432,
-});
-
 const UserRepository = require('./user-repository');
+const dbConnection = require("../config/secrets");
+
 const userService = new UserRepository(dbConnection);
+
+const userRouter = express.Router();
 
 userRouter.get('/users', async (_, response) => {
     try {

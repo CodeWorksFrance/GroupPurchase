@@ -1,6 +1,6 @@
 const Purchases = require('./domain/purchases');
 const purchases = new Purchases();
-const calculate = require('../service/Calculator');
+const calculate = require('../calculation/rounding-off-calculation');
 
 class PurchaseRepository {
 

@@ -1,4 +1,4 @@
-const importItems = require('../../src/service/importItems')
+const importItems = require('../../src/import-file/importItems')
 
 describe( 'importItems', () =>
 {

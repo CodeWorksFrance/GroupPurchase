@@ -1,23 +1,14 @@
 const express = require('express');
-const {Pool} = require("pg");
 const PurchaseRepository = require("./purchase-repository");
-const FileService = require("../service/fileService");
-
+const FileService = require("../import-file/fileService");
+const dbConnection = require("../config/secrets");
 const fileParser = new FileService();
 
+const purchaseService = new PurchaseRepository(dbConnection);
 const purchaseRouter = express.Router();
 
-const dbConnection = new Pool({
-    user: 'grouppurchaseadmin',
-    host: 'localhost',
-    database: 'grouppurchase',
-    password: 'butterfly',
-    port: 5432,
-});
-
-const purchaseService = new PurchaseRepository(dbConnection);
 purchaseRouter.use(function timeLog(req, res, next) {
-    console.log('Time: ', Date.now());
+    console.debug('Time: ', Date.now());
     next();
 });
 
